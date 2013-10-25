@@ -6,6 +6,7 @@ var async = require("async");
 var cache = require("lru-cache");
 var argv = require("optimist").argv;
 var uaparser = require("ua-parser-js");
+var i18n = require("i18next");
 
 var http = require("http");
 var https = require("https");
@@ -17,17 +18,20 @@ var path = require("path");
 var util = require(path.join(__dirname, "util.js"));
 var routes = require(path.join(__dirname, 'routes'));
 
+//Declar top-scope variable
 var server, events;
 
+// Initializa server
 server = express();
 
+// Set global view data
 server.locals = {
 	no_crawl_index: false,
 	show_ad: false,
 	page_id: "unknown",
-	ga: true,
-	pretty: true
+	ga: true
 };
+
 
 server.set('views', path.join(__dirname, 'views'));
 server.set("view engine", "jade");
@@ -41,6 +45,11 @@ server.use(express.cookieSession({
 		maxAge: 1000 * 60 * 60 * 24
 	}
 }));
+
+server.use(function(req, res, next){
+	console.log(req.acceptedLanguages);
+	next();
+});
 
 server.use(function(req, res, next){
 	// Parse the user-agent, find out if browser is compatible
@@ -62,8 +71,15 @@ server.use(function(req, res, next){
 	next();
 });
 
+server.get("/static/js/lang.json", function(req, res){
+	res.set("Content-type", "application/json");
+	res.json(200, {
+		hello: "world"
+	})
+});
 server.get("/:sid?", routes.index);
-server.get("/dev", routes.dev);
+
+
 
 https.createServer({
 	key: fs.readFileSync("./ssl/server.key"),

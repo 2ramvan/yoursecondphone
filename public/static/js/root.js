@@ -27,7 +27,7 @@ require.config({
 	}
 });
 
-require(['src/MainModule', 'lang'], function(MainModule, lang) {
+require(['src/MainModule', 'text!lang.json'], function(MainModule, lang) {
 	window.ysp_lang = lang;
 	window.ysp_errors = {
 		11101: ysp_lang.errors.session_not_found,
