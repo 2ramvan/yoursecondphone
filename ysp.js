@@ -5,6 +5,7 @@ var _ = require("lodash");
 var async = require("async");
 var cache = require("lru-cache");
 var argv = require("optimist").argv;
+var uaparser = require("ua-parser-js");
 
 var http = require("http");
 var https = require("https");
@@ -13,17 +14,56 @@ var fs = require("fs");
 var path = require("path");
 
 // Modules
+var util = require(path.join(__dirname, "util.js"));
 var routes = require(path.join(__dirname, 'routes'));
 
 var server, events;
 
 server = express();
+
+server.locals = {
+	no_crawl_index: false,
+	show_ad: false,
+	page_id: "unknown",
+	ga: true,
+	pretty: true
+};
+
 server.set('views', path.join(__dirname, 'views'));
 server.set("view engine", "jade");
+server.use(express.timeout());
 server.use(express.static(path.join(__dirname, 'public')));
+server.use(express.cookieParser());
+server.use(express.cookieSession({
+	key:"ysp_session",
+	secret:"changeme",
+	cookie: {
+		maxAge: 1000 * 60 * 60 * 24
+	}
+}));
 
+server.use(function(req, res, next){
+	// Parse the user-agent, find out if browser is compatible
+	var parser = new uaparser();
+	req.ua = (parser.setUA(req.get("User-Agent"))).getResult();
 
-server.get("/", routes.index);
+	if (_.contains(["Chrome", "Firefox", "Chromium"], req.ua.browser.name)) {
+		if(_.contains(["Chrome", "Chromium"], req.ua.browser.name)) {
+			if(parseInt(req.ua.browser.major) >= 26) {
+				res.locals.compatible_browser = true;
+			}
+		} else if (req.ua.browser.name == "Firefox") {
+			if(parseInt(req.ua.browser.major) >= 22) {
+				res.locals.compatible_browser = true;
+			}
+		}
+	}
+
+	next();
+});
+
+server.get("/:sid?", routes.index);
+server.get("/dev", routes.dev);
 
 https.createServer({
 	key: fs.readFileSync("./ssl/server.key"),

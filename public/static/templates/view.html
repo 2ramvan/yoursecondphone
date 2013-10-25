@@ -1,0 +1,77 @@
+{{^fatalError}}
+<div class="row">
+	<div class="large-12 columns">
+		<div class="panel" id="main_panel">
+			<header>
+				<div class="row">
+					<div class="large-7 columns">
+						<h4><i class="icon-facetime-video"></i>&nbsp;Session ID: {{sid}}</h4>
+					</div>
+					<div class="large-5 columns">
+						<div id="session_link_hold">
+							<table>
+								<tr>
+									<td>
+										Invite URL:&nbsp;
+									</td>
+									<td proxy-hover="session_link_hover">
+										{{session_link}}
+									</td>
+								</tr>
+							</table>
+							<!--Invite URL:&nbsp;<div id="session_link" proxy-hover="session_link_hover">{{session_link}}</div>-->
+						</div>
+					</div>
+				</div>
+			</header>
+			<div class="panel_body">
+				<div class="row">
+					<div class="large-6 columns" id="publisher_hold" >
+						<div id="publisher"></div>
+					</div>
+					<div class="large-6 columns" id="subscription_hold">
+						<!--div id="subscription"></div-->
+					</div>
+				</div>
+				{{#chat_available}}
+				<div class="row">
+					<div class="large-12 columns">
+						<ul id="chat">
+							{{#messages}}
+							<li><div class="message {{direction}}">{{msg}}</div></li>
+							{{/messages}}
+						</ul>
+						<div id="chat_input_hold">
+							<input type="text" id="chat_input" proxy-keypress="input_activity" placeholder="Send a Message (press 'enter' to send)">
+						</div>
+					</div>
+				</div> 
+				{{/chat_available}}
+				{{^chat_available}}
+				<div class="row">
+					<div class="large-12 columns">
+						<div id="chat_unavailable">
+							<h5><i class="icon-ban-circle"></i>&nbsp;{{lang_chat_unavailable}}</h5>
+						</div>
+					</div>
+				</div>
+				{{/chat_available}}
+			</div>
+		</div>
+	</div>
+</div>
+{{/fatalError}}
+{{#fatalError}}
+<div class="row">
+	<div class="large-8 large-centered columns">
+		<div class="panel error">
+			<header>
+				<h3><i class="icon-warning-sign"></i>&nbsp;Fatal Error</h3>
+			</header>
+			<div class="panel_body">
+				<p>{{fatal_error_message}}</p>
+			</div>
+		</div>
+	</div>
+</div>
+{{/fatalError}}

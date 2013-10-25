@@ -1,0 +1,19 @@
+extends layout
+
+block css
+	link(rel="stylesheet", href="/static/bower_components/nprogress/nprogress.css")
+
+block main
+	.row
+		if skipIntro && compatible_browser
+			.large-12.columns#main_content
+				//- client side app will load here
+		else
+			include includes/intro
+
+block js
+	if compatible_browser
+		script(src="/static/js/plugin/webrtc_adapter.js")
+		script(src="/static/js/lib/loglevel.min.js")
+		script(src="/static/bower_components/nprogress/nprogress.js")
+		script(src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js", data-main="/static/js/root.js")
