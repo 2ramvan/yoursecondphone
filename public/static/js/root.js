@@ -27,8 +27,8 @@ require.config({
 	}
 });
 
-require(['src/MainModule', 'text!lang.json'], function(MainModule, lang) {
-	window.ysp_lang = lang;
+require(['src/MainModule', 'text!/static/js/lang.json'], function(MainModule, lang) {
+	window.ysp_lang = JSON.parse(lang);
 	window.ysp_errors = {
 		11101: ysp_lang.errors.session_not_found,
 		11102: ysp_lang.errors.global_ajax_error,

@@ -1,0 +1,69 @@
+extends layout
+
+block main
+	.row
+		.large-6.columns
+			.panel#history
+				header: h3: <i class="icon-road"></i>&nbsp;History
+				.panel_body
+					p.
+						<b>Your Second Phone</b> started as a little experminent back in 2010. It originally existed as a means to call phones right from the browser, but has since evolved into a multi-tool of ad hoc communications.
+					p.
+						With the advent of WebRTC, <b>Your Second Phone</b> has become a turnkey video chat client, where anybody can simply load a session without having an account or handing over personal infomation. <b>Your Second Phone</b> has never and will never require an account to use.
+		.large-6.columns
+			.panel#team
+				header: h3: <i class="icon-male"></i>&nbsp;Meet the Team
+				.panel_body
+					p.
+						<b>Your Second Phone</b> has been maintained and coded by me, <a href="http://nick.comer.io" target="_blank">Nick Comer</a>, for its entire existence. I like knowing that I can provide a very hassle-free means of letting people communicate with others.
+	.row
+		.large-12.columns
+			.panel#advantage
+				header: h3: <i class="icon-thumbs-up"></i>&nbsp;Advantages
+				.panel_body
+					p.
+						Asking yourself why <b>Your Second Phone</b> is better than other video chat services? Let the table below tell you!
+					table#advantages_table
+						thead
+							tr
+								th
+								th Requires Account
+								th Requires Installation
+								th Open Source
+								th Respects Privacy
+						tbody
+							tr
+								td.service_label Skype
+								td Yes
+								td Yes
+								td No
+								td No
+							tr
+								td.service_label Google+ Hangouts
+								td Yes
+								td Yes
+								td No
+								td Unknown
+							tr
+								td.service_label Facebook
+								td Yes
+								td Yes
+								td No
+								td No
+							tr
+								td.service_label Your Second Phone
+								td No
+								td No
+								td Yes
+								td Yes
+	.row
+		.large-12.columns
+			.panel
+				header: h3: <i class="icon-code-fork"></i>&nbsp;Contributing
+				.panel_body
+					p
+						<b>Your Second Phone</b> is open source. The code that runs everything is freely available to sift through. Contributions to the code and pull-requests are welcomed.
+					p.
+						If you find and issue but don't know much code, thats okay, just open an issue on GitHub and it will be addressed.
+					p
+						<a href="https://github.com/yoursecondphone" target="_blank">Your Second Phone's GitHub</a>

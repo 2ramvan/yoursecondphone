@@ -104,51 +104,8 @@ body {
 	}
 
 	&#donate {
-
-		#receipt_email_check {
-			margin-bottom: 10px;
-		}
-	
-		#receipt_email_hold {
-			display: none;
-		}
-
-		#credit_card_payment {
-			margin-bottom: 25px;
-		}
-
-		ul#amounts {
-			list-style: none;
-			margin: 0px;
-			padding: 0px;
-			border: none;
-
-			li.amount {
-				.round_all;
-				background-color: @prim;
-				margin-bottom: 10px;
-				padding: 5px;
-				cursor: pointer;
-
-				div.amount_display {
-					color: white;
-				}
-				div.amount_check {
-					color: @sec;
-					text-align: right;
-				}
-
-				&.selected {
-					div.amount_check {
-						color: white;
-					}
-				}
-			}
-
-			li#other_amount_hold {
-				display: none;
-				margin-bottom: 10px;
-			}
+		.button.share {
+			margin-right: 5px;
 		}
 	}
 
@@ -378,7 +335,7 @@ body {
 				border-bottom-color: #c0392b;
 			}
 			div.panel_body {
-				i[class^="icon"] {
+				i.fa {
 					color: @dark_grey;
 				}
 				p {
@@ -399,6 +356,7 @@ body {
 			h1,h2,h3,h4,h5,h6 {
 				margin: 0px;
 				color: white;
+				font-family: "Aldrich";
 			}
 
 			ul.button-group {

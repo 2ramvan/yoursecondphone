@@ -2,7 +2,7 @@ define(['src/BaseModule', 'src/BaseException', 'src/ChatModule', 'src/ViewModule
 	function(BaseModule, BaseException, ChatModule, ViewModule, TelephonyModule, async, _, notice) {
 		var MainModule = BaseModule.subclass({
 			module_id: 'MainModule',
-			watchFor: [11204, 1007, 2000, 11101, 11102, 11103, 11105, 11106, 11107],
+			watchFor: [11204, 1007, 2000, 11101, 11102, 11103, 11105, 11106, 11107, 1005],
 			timestamp_fmt: "{HH}:{mm}:{ss}",
 			constructor: function() {
 				base = this;

@@ -9,6 +9,9 @@
     "optimist": "~0.6.0",
     "ua-parser": "~0.3.3",
     "ua-parser-js": "~0.6.2",
-    "i18next": "~1.7.1"
+    "i18next": "~1.7.1",
+    "debug": "~0.7.2",
+    "opentok": "~0.3.4",
+    "httpinvoke": "~1.0.4"
   }
 }
