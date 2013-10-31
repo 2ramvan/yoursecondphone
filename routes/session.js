@@ -139,6 +139,7 @@ var get_token = function(sid, user_session, callback) {
 			tkn = ot.generateToken({
 				session_id: cache.get(sid)
 			});
+			user_session["token_{1}".assign(sid)] = tkn;
 			callback(null, tkn);
 		} else {
 			callback("Cache does not have that SID...");
