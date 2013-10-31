@@ -30,7 +30,7 @@ exports.init = function(){
 	server.use(express.cookieParser());
 	server.use(express.cookieSession({
 		key:"ysp_session",
-		secret:"changeme",
+		secret: ysp_config.cookie_secret,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24
 		}
