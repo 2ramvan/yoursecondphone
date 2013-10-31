@@ -7,19 +7,24 @@ exports.check_compatibility = function(){
 	return function(req, res, next){
 		req.ua = (parser.setUA(req.get("User-Agent"))).getResult();
 
-		if (_.contains(["Chrome", "Firefox", "Chromium"], req.ua.browser.name)) {
-			if(_.contains(["Chrome", "Chromium"], req.ua.browser.name)) {
-				if(parseInt(req.ua.browser.major) >= 24) {
-					res.locals.compatible_browser = true;
-				}
-			} else if (req.ua.browser.name == "Firefox") {
-				if(parseInt(req.ua.browser.major) >= 22) {
-					res.locals.compatible_browser = true;
+		if(req.query.ignore_browser_compat == "yes"){
+			if (_.contains(["Chrome", "Firefox", "Chromium"], req.ua.browser.name)) {
+				if(_.contains(["Chrome", "Chromium"], req.ua.browser.name)) {
+					if(parseInt(req.ua.browser.major) >= 24) {
+						res.locals.compatible_browser = true;
+					}
+				} else if (req.ua.browser.name == "Firefox") {
+					if(parseInt(req.ua.browser.major) >= 22) {
+						res.locals.compatible_browser = true;
+					}
 				}
 			}
-		}
 
-		next();
+			next();
+		} else {
+			res.locals.compatible_browser = true;
+			next();
+		}
 	};
 };
 
