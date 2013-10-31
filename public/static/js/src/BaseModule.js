@@ -36,7 +36,7 @@ define(['stapes', 'underscore', 'notice', 'src/BaseException'], function(Stapes,
 						break;
 					case "error":
 						options.error(response.message, response.code);
-						mod_root.error(new BaseException(response.code, response.msg));
+						mod_root.error(new BaseException(11102));
 						break;
 					default:
 						mod_root.error(new BaseException(11107));
