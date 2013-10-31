@@ -39,7 +39,7 @@ define(['stapes', 'underscore', 'notice', 'src/BaseException'], function(Stapes,
 						mod_root.error(new BaseException(11102));
 						break;
 					default:
-						mod_root.error(new BaseException(11107));
+						mod_root.error(new BaseException(11102));
 						mod_root.debug('bad response: ', response);
 						break;
 				}
