@@ -17,3 +17,5 @@ node_modules
 ssl
 *.key
 *.crt
+
+ysp_config.js
