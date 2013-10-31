@@ -36,13 +36,15 @@ define(['stapes', 'underscore', 'notice', 'src/BaseException'], function(Stapes,
 						break;
 					case "error":
 						options.error(response.message, response.code);
-						mod_root.error(new BaseException(11102));
+						mod_root.error(new BaseException(response.code, response.msg));
 						break;
 					default:
-						mod_root.error(new BaseException(11102));
+						mod_root.error(new BaseException(11107));
 						mod_root.debug('bad response: ', response);
 						break;
 				}
+			}).fail(function($xhr, text_status, error_thrown){
+				mod_root.error(new BaseException(11102));
 			});
 
 			return jqXHR;
