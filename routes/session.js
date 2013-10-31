@@ -137,7 +137,7 @@ var get_token = function(sid, user_session, callback) {
 	} else {
 		if (cache.has(sid)) {
 			tkn = ot.generateToken({
-				session_id: sid
+				session_id: cache.get(sid)
 			});
 			callback(null, tkn);
 		} else {
