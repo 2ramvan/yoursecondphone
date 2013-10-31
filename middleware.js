@@ -8,6 +8,9 @@ exports.check_compatibility = function(){
 		req.ua = (parser.setUA(req.get("User-Agent"))).getResult();
 
 		if(req.query.ignore_browser_compat == "yes"){
+			res.locals.compatible_browser = true;
+			next();
+		} else {
 			if (_.contains(["Chrome", "Firefox", "Chromium"], req.ua.browser.name)) {
 				if(_.contains(["Chrome", "Chromium"], req.ua.browser.name)) {
 					if(parseInt(req.ua.browser.major) >= 24) {
@@ -20,9 +23,6 @@ exports.check_compatibility = function(){
 				}
 			}
 
-			next();
-		} else {
-			res.locals.compatible_browser = true;
 			next();
 		}
 	};

@@ -27,6 +27,7 @@ exports.init = function(){
 	server.set("view engine", "jade");
 	server.use(express.timeout());
 	server.use(express.static("./public"));
+	server.use(express.logger());
 	server.use(express.cookieParser());
 	server.use(express.cookieSession({
 		key:"ysp_session",
