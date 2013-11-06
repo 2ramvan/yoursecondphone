@@ -26,6 +26,7 @@ exports.init = function(){
 	server.set('views', "./views");
 	server.set("view engine", "jade");
 	server.use(express.timeout());
+	server.use(express.compress());
 	server.use(express.static("./public"));
 	server.use(express.logger());
 	server.use(express.cookieParser());
