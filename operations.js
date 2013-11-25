@@ -39,7 +39,7 @@ exports.init = function(){
 	}));
 
 	server.use(mw.check_compatibility());
-	server.use(mw.check_for_dnt());
+	// server.use(mw.check_for_dnt());
 
 	main_routes(server);
 	session(server);
@@ -52,6 +52,13 @@ exports.init = function(){
 				page_id: "not_found"
 			});
 		}
+	});
+
+	server.use(function(err, req, res, next){
+		res.status(500);
+		res.render("server_error", {
+			page_id: "server_error"
+		});
 	});
 };
 exports.run = function(){
