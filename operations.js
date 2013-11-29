@@ -26,6 +26,12 @@ exports.init = function(){
 	server.set('views', "./views");
 	server.set("view engine", "jade");
 	server.use(express.timeout());
+	server.use(function(req, res, next){
+		// Enable Strict Transport Security; max age possible.
+		// http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+		res.set("Strict-Transport-Security", "max-age=31536000");
+		next();
+	});
 	server.use(express.compress());
 	server.use(express.static("./public"));
 	server.use(express.logger());
