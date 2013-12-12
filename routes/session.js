@@ -27,6 +27,20 @@ module.exports = function(server) {
 			// If the YSP Session is still around, load it up and return its data back to the user
 			if (cache.has(sid)) {
 				get_token(sid, req.session, function(err, token) {
+					if(err){
+						// Just reset everything
+						cache.has(sid) && cache.del(sid);
+						req.session.hasOwnProperty("token_{1}".assign(sid)) && delete req.session["token_{1}".assign(sid)];
+						req.session.hasOwnProperty("sid") && delete req.session.sid;
+
+						console.error("ERROR: %s - %s", new Date(), err.hasOwnProperty("stack") ? err.stack : err);
+						return res.json(200, {
+							status: "error",
+							code: 11105,
+							message: "An unknown error occured."
+						});
+					}
+
 					res.json(201, {
 						status: "success",
 						data: {
@@ -136,9 +150,13 @@ var get_token = function(sid, user_session, callback) {
 		callback(null, tkn);
 	} else {
 		if (cache.has(sid)) {
-			tkn = ot.generateToken({
-				session_id: cache.get(sid)
-			});
+			try {
+				tkn = ot.generateToken({
+					session_id: cache.get(sid)
+				});
+			}catch(e){
+				return callback(e);
+			}
 			user_session["token_{1}".assign(sid)] = tkn;
 			callback(null, tkn);
 		} else {
