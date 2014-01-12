@@ -3,7 +3,10 @@ var async = require("async");
 var express = require("express");
 var https = require("https");
 var http = require("http");
+var util = require("util");
 var fs = require("fs");
+var cluster = require("cluster");
+var debug = require("debug")("ysp:operations");
 
 var mw = require("./middleware");
 var main_routes = require("./routes");
@@ -35,6 +38,10 @@ exports.init = function(){
 	server.use(express.compress());
 	server.use(express.static("./public"));
 	server.use(express.logger());
+	server.use(function(req, res, next){
+		debug("worker %d: Incoming HTTP Request", cluster.worker.id);
+		next();
+	});
 	server.use(express.cookieParser());
 	server.use(express.cookieSession({
 		key:"ysp_session",
@@ -49,6 +56,10 @@ exports.init = function(){
 
 	main_routes(server);
 	session(server);
+
+	server.get("/error", function(req, res){
+		throw new Error();
+	});
 
 	server.use(function(req, res, next){
 		res.status(404);
@@ -65,6 +76,10 @@ exports.init = function(){
 		res.render("server_error", {
 			page_id: "server_error"
 		});
+	});
+
+	process.on("uncaughtException", function(){
+
 	});
 };
 exports.run = function(){
