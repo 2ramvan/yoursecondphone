@@ -1,14 +1,37 @@
 {
+  "name": "yoursecondphone",
+  "version": "0.0.0",
+  "description": "yoursecondphone ===============",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "dependencies": {
     "async": "~0.2.9",
-    "lodash": "~2.2.1",
-    "sugar": "~1.4.1",
-    "express": "~3.4.7",
-    "lru-cache": "~2.3.1",
-    "ua-parser-js": "~0.6.2",
-    "debug": "~0.7.2",
-    "opentok": "~0.3.4",
+    "debug": "~0.7.4",
     "jade": "~0.35.0",
-    "messenger": "0.0.9"
-  }
+    "lodash": "~2.2.1",
+    "lru-cache": "~2.3.1",
+    "express": "~3.4.7",
+    "dnode": "~1.2.0",
+    "ua-parser-js": "~0.6.2",
+    "sugar": "~1.4.1",
+    "opentok": "git://github.com/yoursecondphone/opentok-node.git",
+    "client-sessions": "~0.6.0",
+    "flic": "git://github.com/nkcmr/flic.git"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"no tests available\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yoursecondphone/yoursecondphone"
+  },
+  "author": "Nick Comer <nick@comer.io>",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/yoursecondphone/yoursecondphone/issues"
+  },
+  "homepage": "https://github.com/yoursecondphone/yoursecondphone"
 }

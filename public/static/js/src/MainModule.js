@@ -36,24 +36,26 @@ define(['src/BaseModule', 'src/BaseException', 'src/ChatModule', 'src/ViewModule
 							function(callback) {
 								var sid = window.location.pathname.replace(/[^a-z]/g, "");
 								var resource, opts = {
-										success: function(data) {
-											mod_root.sid = data.sid;
-											mod_root.session_id = data.session_id;
-											mod_root.token = data.token;
+									method: "POST",
+									success: function(data) {
+										mod_root.sid = data.sid;
+										mod_root.session_id = data.session_id;
+										mod_root.token = data.token;
 
-											callback(null);
-										},
-										fail: function(data) {
-											callback(new BaseException(data.code));
-										},
-										error: function(data) {
-											callback(new BaseException(data.code, data.message));
-										}
-									};
+										callback(null);
+									},
+									fail: function(data) {
+										callback(new BaseException(data.code));
+									},
+									error: function(data) {
+										callback(new BaseException(data.code, data.message));
+									}
+								};
 
 								if (sid === "") {
-									resource = "/session/create";
+									resource = "/session";
 								} else {
+									opts.method = "GET";
 									resource = "/session/{1}".assign(sid);
 								}
 
