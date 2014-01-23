@@ -19,3 +19,5 @@ ssl
 *.crt
 
 ysp_config.js
+./boot
+
