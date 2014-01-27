@@ -19,5 +19,6 @@ ssl
 *.crt
 
 ysp_config.js
-./boot
+boot.json
+
 
