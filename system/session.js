@@ -1,6 +1,5 @@
 var debug = require("debug")("ysp:session");
 var _ = require("lodash");
-var LRU = require("lru-cache");
 var OpenTok = require("opentok");
 var async = require("async");
 var fs = require("fs");
@@ -9,9 +8,6 @@ var util = require("util");
 var ot_key = process.env.OT_KEY;
 var ot_secret = process.env.OT_SECRET;
 var ot = new OpenTok(ot_key, ot_secret);
-
-// var messenger = require("messenger");
-// var master = messenger.createSpeaker(9921);
 
 var Slave = require("flic").slave;
 var slv = new Slave(function(){
@@ -148,112 +144,6 @@ session.store = function(req, res){
 
 		return res.json(200, response);
 	});
-
-	// async.waterfall([
-
-	// 	function(callback_1) {
-	// 		if (sid) {
-	// 			debug("User already has 'sid'");
-
-	// 			cache.has(sid, function(haz) {
-	// 				debug("cache %s have 'sid'", haz ? "does" : "does not");
-	// 				console.log("cache %s have 'sid'", haz ? "does" : "does not");
-	// 				if (haz) {
-	// 					get_token(sid, req.session, function(err, token) {
-	// 						if (err) {
-	// 							cache.del(sid);
-	// 							req.session.hasOwnProperty(util.format("token_%s", sid)) && delete req.session[util.format("token_%s", sid)];
-	// 							req.session.hasOwnProperty("sid") && delete req.session.sid;
-
-	// 							console.error("ERROR: %s - %s", new Date(), err.hasOwnProperty("stack") ? err.stack : err);
-
-	// 							return callback_1({
-	// 								status: "error",
-	// 								code: 11105,
-	// 								message: "An unknown error occured."
-	// 							});
-	// 						} else {
-	// 							cache.get(sid, function(session_id) {
-	// 								callback_1({
-	// 									status: "success",
-	// 									data: {
-	// 										sid: sid,
-	// 										session_id: session_id,
-	// 										token: token
-	// 									}
-	// 								})
-	// 							});
-	// 						}
-	// 					});
-	// 				} else {
-	// 					req.session = {};
-	// 					callback_1(null);
-	// 				}
-	// 			});
-	// 		} else {
-	// 			callback_1(null);
-	// 		}
-	// 	},
-	// 	function(callback_1){
-	// 		debug("Creating new session...");
-
-	// 		var ot_session_id, ot_token, sid;
-	// 		async.waterfall([
-
-	// 			function(callback_2) {
-	// 				debug("Contacting opentok...");
-	// 				var location = "127.0.0.1";
-	// 				ot.createSession(location, {
-	// 					"p2p.preference": "enabled"
-	// 				}, callback_2);
-	// 			},
-	// 			function(session_id, callback_2) {
-	// 				ot_session_id = session_id;	
-
-	// 				try{
-	// 					debug("Getting token...");
-	// 					ot_token = ot.generate_token(session_id);
-	// 				} catch(e) {
-	// 					debug("Caught error whilst generating token! ", e);
-	// 					return callback_2(e);
-	// 				}
-
-	// 				debug("No error occured...");
-	// 				callback_2(null);
-	// 			},
-	// 			function(callback_2) {
-	// 				debug("Generating 'sid'...");
-	// 				sid = generate_sid();
-	// 				callback_2(null);
-	// 			},
-	// 			function(callback_2) {
-	// 				debug("Storing metadata...");
-	// 				cache.set(sid, ot_session_id);
-	// 				req.session.sid = sid;
-	// 				req.session[util.format("token_%s", sid)] = ot_token;
-
-	// 				callback_2(null, ot_session_id, ot_token, sid);
-	// 			}
-	// 		], function(err, a, b, c) {
-	// 			if(err) throw err;
-
-	// 			debug("Sending response...");
-	// 			return callback_1({
-	// 				status: "success",
-	// 				data: {
-	// 					sid: c,
-	// 					session_id: a,
-	// 					token: b
-	// 				}
-	// 			});
-	// 		});
-
-	// 	}
-	// ], function(response) {
-	// 	if(response){
-	// 		return res.json(200, response);
-	// 	}
-	// });
 };
 
 session.show = function(req, res){

@@ -1,13 +1,10 @@
 process.title = "Your Second Phone - cache.js";
 
-console.log("what the fuck")
-
 var LRU = require("lru-cache");
-var debug = require("debug")("cache");
+var debug = require("debug")("ysp:cache");
 var flic = require("flic");
 var Master = flic.master;
 var Slave = flic.slave;
-// var messenger = require("messenger");
 
 debug("cache online...");
 
