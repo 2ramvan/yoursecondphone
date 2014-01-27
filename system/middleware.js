@@ -1,5 +1,6 @@
 var _ = require("lodash");
 var uaparser = require("ua-parser-js");
+var debug = require("debug")("ysp:middleware");
 
 exports.check_compatibility = function(){
 	var parser = new uaparser();

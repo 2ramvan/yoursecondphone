@@ -1,8 +1,13 @@
-process.title = "ysp cache";
+process.title = "Your Second Phone - cache.js";
+
+console.log("what the fuck")
 
 var LRU = require("lru-cache");
-var debug = require("debug")("ysp:cache");
-var messenger = require("messenger");
+var debug = require("debug")("cache");
+var flic = require("flic");
+var Master = flic.master;
+var Slave = flic.slave;
+// var messenger = require("messenger");
 
 debug("cache online...");
 
@@ -11,30 +16,28 @@ var cache = LRU({
 	maxAge: 1000 * 60 * 60 * 24
 });
 
-var comms = messenger.createListener(9921);
+var master = new Master();
 
-comms.on("cache:get", function(m, data) {
-	debug("cache:get - %s", data);
-
-	var a = cache.get(data);
-
-	m.reply(a);
+var cache_slave = new Slave("cache", function(err){
+	if(err) throw err;
 });
-comms.on("cache:has", function(m, data) {
-	debug("cache:has - %s", data);
 
-	var a = cache.has(data);
-
-	m.reply(a);
+cache_slave.on("get", function(key, callback){
+	var val = cache.get(key);
+	callback(null, val);
 });
-comms.on("cache:set", function(m, data) {
-	debug("cache:set - %s", data.key);
 
-	var a = cache.set(data.key, data.val);
+cache_slave.on("has", function(key, callback){
+	var haz = cache.has(key);
+	callback(null, haz);
 });
-comms.on("cache:del", function(m, data) {
-	debug("cache:del - %s", data);
-	if (cache.has(data)) {
-		cache.del(data);
-	}
+
+cache_slave.on("set", function(key, val, callback){
+	cache.set(key, val);
+	callback(null);
+});
+
+cache_slave.on("del", function(key, callback){
+	cache.del(key);
+	callback(null);
 });

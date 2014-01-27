@@ -10,22 +10,35 @@ var ot_key = process.env.OT_KEY;
 var ot_secret = process.env.OT_SECRET;
 var ot = new OpenTok(ot_key, ot_secret);
 
-var messenger = require("messenger");
-var master = messenger.createSpeaker(9921);
+// var messenger = require("messenger");
+// var master = messenger.createSpeaker(9921);
+
+var Slave = require("flic").slave;
+var slv = new Slave(function(){
+	debug("Slave connected.");
+});
 
 // Start the cache
 var cache = {
 	get: function(key, callback) {
-		master.request("cache:get", key, callback || function() {});
+		slv.tell("cache:get", key, function(err, val){
+			if(err) throw err;
+
+			callback.call(null, val);
+		});
 	},
-	set: function(key, val, callback) {
-		master.request("cache:set", { key: key, val: val }, callback || function() {});
+	set: function(key, val) {
+		slv.tell("cache:set", key, val);
 	},
 	has: function(key, callback) {
-		master.request("cache:has", key, callback || function() {});
+		slv.tell("cache:has", key, function(err, haz){
+			if(err) throw err;
+
+			callback.call(null, haz);
+		});
 	},
-	del: function(key, callback) {
-		master.request("cache:del", key, callback || function() {});
+	del: function(key) {
+		slv.tell("cache:del", key);
 	}
 };
 
@@ -97,6 +110,8 @@ session.store = function(req, res){
 				callback_1(null, ot_session_id, ot_token, sid);
 			},
 			function(ot_session_id, ot_token, sid, callback_1){
+				req.session.sid = sid;
+				cache.set(sid, ot_session_id);
 				debug("createNewSession - sending response");
 				callback_1(null, {
 					status: "success",
@@ -325,17 +340,14 @@ var get_token = function(sid, user_session, callback) {
 		cache.has(sid, function(haz){
 			if (haz) {
 				cache.get(sid, function(session_id){
+					debug("get_token - session_id:%s", session_id);
 					try {
-						tkn = ot.generateToken({
-							session_id: session_id
-						});
+						tkn = ot.generateToken(session_id);
 					} catch (e) {
 						return callback(e);
 					}
-
 					user_session[util.format("token_%s", sid)] = tkn;
 					callback(null, tkn);
-
 				});
 			} else {
 				callback(new Error("Problem retrieving a token."));

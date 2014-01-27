@@ -1,4 +1,4 @@
-process.title = "YSP web-worker";
+process.title = "Your Second Phone - web-worker.js";
 
 var root = __dirname.split("/");
 var root_dir = "";
@@ -56,7 +56,7 @@ server.use(express.cookieParser());
 server.use(sessions({
 	cookieName: "ysp",
 	requestKey: "session",
-	secret: process.env.COOKIE_SECRET || "secret_11284622",
+	secret: process.env.COOKIE_SECRET,
 	duration: 24 * 60 * 60 * 1000,
 	cookie: {
 		httpOnly: true
