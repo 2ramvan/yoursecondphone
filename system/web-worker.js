@@ -49,7 +49,7 @@ server.use(express.compress());
 server.use(express.static(root_dir + "/public"));
 
 // Let's do some logging
-server.use(express.logger("dev"));	
+server.use(express.logger());	
 
 server.use(express.cookieParser());
 
