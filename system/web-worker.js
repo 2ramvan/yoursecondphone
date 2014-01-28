@@ -45,11 +45,11 @@ server.use(middleware.set_strict_transport_security());
 // Let's save some bandwidth and load time
 server.use(express.compress());
 
-// Let's do some logging
-server.use(express.logger());	
-
 // Set the static resoureces directory
 server.use(express.static(root_dir + "/public"));
+
+// Let's do some logging
+server.use(express.logger());	
 
 server.use(express.cookieParser());
 
