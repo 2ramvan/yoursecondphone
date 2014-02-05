@@ -9,32 +9,32 @@ var ot_key = process.env.OT_KEY;
 var ot_secret = process.env.OT_SECRET;
 var ot = new OpenTok(ot_key, ot_secret);
 
-var Slave = require("flic").slave;
-var slv = new Slave(function(){
-	debug("Slave connected.");
+var Node = require("flic").node;
+var nd = new Node(function(err){
+	debug("Node connected.");
 });
 
 // Start the cache
 var cache = {
 	get: function(key, callback) {
-		slv.tell("cache:get", key, function(err, val){
+		nd.tell("cache:get", key, function(err, val){
 			if(err) throw err;
 
 			callback.call(null, val);
 		});
 	},
 	set: function(key, val) {
-		slv.tell("cache:set", key, val);
+		nd.tell("cache:set", key, val);
 	},
 	has: function(key, callback) {
-		slv.tell("cache:has", key, function(err, haz){
+		nd.tell("cache:has", key, function(err, haz){
 			if(err) throw err;
 
 			callback.call(null, haz);
 		});
 	},
 	del: function(key) {
-		slv.tell("cache:del", key);
+		nd.tell("cache:del", key);
 	}
 };
 
