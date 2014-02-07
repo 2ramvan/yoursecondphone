@@ -10,7 +10,7 @@ require.config({
 		stapes: ['//cdnjs.cloudflare.com/ajax/libs/stapes/0.8.0/stapes.min', 'lib/stapes.min'],
 		underscore: ['//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min', 'lib/underscore-min'],
 		Ractive: ['//cdnjs.cloudflare.com/ajax/libs/ractive.js/0.3.6/ractive.min', 'lib/ractive.min'],
-		opentok: ['lib/TB.min'],
+		opentok: ["lib/TB.min"],
 		notice: ['lib/notice.min'],
 		socket: ['//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min', 'lib/socket.io.min']
 	},
