@@ -1,5 +1,6 @@
 define(['opentok', 'src/BaseModule', 'src/BaseException', 'async', 'notice'],
 	function(TB, BaseModule, BaseException, async, notice) {
+		TB.setLogLevel(0);
 		var TelephonyModule = BaseModule.subclass({
 			watchFor: [1000, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1013, 1014, 1500, 1510, 1520, 1530, 1535, 2000, 2010],
 			module_id: 'TelephonyModule',
