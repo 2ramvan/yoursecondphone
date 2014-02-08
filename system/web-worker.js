@@ -10,6 +10,7 @@ for (var i = 0; i < root.length; i++) {
 // Libraries
 var express = require("express"),
 	fs = require("fs"),
+	spdy = require("spdy"),
 	debug = require("debug")("ysp:web-worker"),
 	sessions = require("client-sessions"),
 // Helpers
@@ -89,7 +90,7 @@ server.use(basic.not_found);
 server.use(basic.server_error);
 
 require("http").createServer(server).listen(process.env.UNSECURE_PORT || 80);
-require("https").createServer({
+spdy.createServer({
 	key: fs.readFileSync(root_dir + "/system/ssl/server.key"),
 	cert: fs.readFileSync(root_dir + "/system/ssl/server.crt"),
 	ca: [fs.readFileSync(root_dir + "/system/ssl/AddTrustExternalCARoot.crt"), fs.readFileSync(root_dir + "/system/ssl/PositiveSSLCA2.crt")]

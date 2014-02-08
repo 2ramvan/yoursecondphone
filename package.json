@@ -13,12 +13,12 @@
     "lodash": "~2.2.1",
     "lru-cache": "~2.3.1",
     "express": "~3.4.7",
-    "dnode": "~1.2.0",
     "ua-parser-js": "~0.6.2",
     "sugar": "~1.4.1",
     "opentok": "git://github.com/yoursecondphone/opentok-node.git",
     "client-sessions": "~0.6.0",
-    "flic": "git://github.com/nkcmr/flic.git"
+    "flic": "git://github.com/nkcmr/flic.git",
+    "spdy": "~1.19.1"
   },
   "devDependencies": {},
   "scripts": {
