@@ -17,8 +17,8 @@
     "sugar": "~1.4.1",
     "opentok": "git://github.com/yoursecondphone/opentok-node.git",
     "client-sessions": "~0.6.0",
-    "flic": "git://github.com/nkcmr/flic.git",
-    "spdy": "~1.19.1"
+    "spdy": "~1.19.1",
+    "flic": "~1.0.3"
   },
   "devDependencies": {},
   "scripts": {
