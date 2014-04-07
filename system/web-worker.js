@@ -13,6 +13,7 @@ var express = require("express"),
 	spdy = require("spdy"),
 	debug = require("debug")("ysp:web-worker"),
 	sessions = require("client-sessions"),
+	rollbar = require('rollbar'),
 // Helpers
 	session = require(root_dir + "/system/session.js"),
 	basic = require(root_dir + "/system/basic.js"),
@@ -87,6 +88,9 @@ server.post("/session", session.store);
 server.get("/session/:sid", session.show);
 
 server.use(basic.not_found);
+
+server.use(rollbar.errorHandler(process.env.ROLLBAR_KEY));
+
 server.use(basic.server_error);
 
 require("http").createServer(server).listen(process.env.UNSECURE_PORT || 80);
@@ -95,3 +99,5 @@ spdy.createServer({
 	cert: fs.readFileSync(root_dir + "/system/ssl/server.crt"),
 	ca: [fs.readFileSync(root_dir + "/system/ssl/AddTrustExternalCARoot.crt"), fs.readFileSync(root_dir + "/system/ssl/PositiveSSLCA2.crt")]
 }, server).listen(process.env.SECURE_PORT || 443);
+
+rollbar.handleUncaughtExceptions(process.env.ROLLBAR_KEY, { exitOnUncaughtException: true });

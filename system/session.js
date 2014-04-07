@@ -11,6 +11,10 @@ var ot = new OpenTok(ot_key, ot_secret);
 
 var Node = require("flic").node;
 var nd = new Node(function(err){
+	if(err){
+		throw err;
+	}
+
 	debug("Node connected.");
 });
 
@@ -39,7 +43,7 @@ var cache = {
 };
 
 var session = {};
-session.store = function(req, res){
+session.store = function(req, res, next){
 	// POST /session
 
 	var reviveSession = function(a, callback){
@@ -90,14 +94,25 @@ session.store = function(req, res){
 		async.waterfall([
 			function(callback_1){
 				debug("createNewSession - contacting opentok");
-				ot.createSession({
-					location: "127.0.0.1",
-					p2p: true
-				}, callback_1);
+
+				try{
+					ot.createSession({
+						location: "127.0.0.1",
+						p2p: true
+					}, callback_1);
+				}catch(e){
+					return next(e);
+				}
 			},
 			function(ot_session_id, callback_1){
 				debug("createNewSession - generating opentok token");
-				var ot_token = ot.generateToken(ot_session_id);
+
+				try{
+					var ot_token = ot.generateToken(ot_session_id);
+				}catch(e){
+					return next(e);
+				}
+
 				callback_1(null, ot_session_id, ot_token);
 			},
 			function(ot_session_id, ot_token, callback_1){
@@ -140,7 +155,7 @@ session.store = function(req, res){
 			}
 		}
 	], function(err, response){
-		if(err) throw err;
+		if(err) return next(err);
 
 		return res.json(200, response);
 	});
@@ -184,11 +199,7 @@ session.show = function(req, res){
 					req.session.hasOwnProperty("sid") && delete req.session.sid;
 
 					console.error("ERROR: %s - %s", new Date(), err.hasOwnProperty("stack") ? err.stack : err);
-					return callback({
-						status: "error",
-						code: 11105,
-						message: "An unknown error occured."
-					});
+					return callback(new Error(11105));
 				}
 
 				ot_token = token;
