@@ -95,9 +95,13 @@ server.use(basic.server_error);
 
 require("http").createServer(server).listen(process.env.UNSECURE_PORT || 80);
 spdy.createServer({
-	key: fs.readFileSync(root_dir + "/system/ssl/server.key"),
-	cert: fs.readFileSync(root_dir + "/system/ssl/server.crt"),
-	ca: [fs.readFileSync(root_dir + "/system/ssl/AddTrustExternalCARoot.crt"), fs.readFileSync(root_dir + "/system/ssl/PositiveSSLCA2.crt")]
+	key: fs.readFileSync("/etc/ssl/private/server.key"),
+	cert: fs.readFileSync("/etc/ssl/private/yoursecondphone_co.crt"),
+	ca: [
+		fs.readFileSync("/etc/ssl/certs/AddTrustExternalCARoot.crt"), 
+		fs.readFileSync("/etc/ssl/certs/COMODORSAAddTrustCA.crt"),
+		fs.readFileSync("/etc/ssl/certs/COMODORSADomainValidationSecureServerCA.crt")
+	]
 }, server).listen(process.env.SECURE_PORT || 443);
 
 rollbar.handleUncaughtExceptions(process.env.ROLLBAR_KEY, { exitOnUncaughtException: true });
