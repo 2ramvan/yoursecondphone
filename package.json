@@ -19,7 +19,8 @@
     "client-sessions": "~0.6.0",
     "spdy": "~1.19.1",
     "flic": "~1.0.3",
-    "rollbar": "^0.3.2"
+    "rollbar": "^0.3.2",
+    "peer": "^0.2.5"
   },
   "devDependencies": {},
   "scripts": {

@@ -1,0 +1,55 @@
+<div id="root-view">
+  <div class="row">
+    <div class="large-6 columns">
+      <div id="videochat" class="panel animated">
+        <header>
+          <h4><i class="fa fa-video-camera"></i>&nbsp;Video Chat</h4>
+        </header>
+        <div class="panel_body">
+          <p>Your Second Phone allows you to chat face-to-face with anyone. Simply create a session, send your friend the link and chat for as long as you need, it's <b>free!</b></p>
+        </div>
+      </div>
+    </div>
+    <div class="large-6 columns">
+      <div id="noaccount" class="panel animated">
+        <header>
+          <h4><i class="fa fa-magic"></i>&nbsp;No Account</h4>
+        </header>
+        <div class="panel_body">
+          <p>You don't need to have an account to use Your Second Phone. Once a session is created, the link to it will last for 24 hours, but the call can last much longer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="large-12 columns">
+      <div id="setup-step-1" ng-show="current_step == 1" class="panel">
+        <header>
+          <h4>Step 1: Allow access to webcam!</h4>
+        </header>
+        <div class="panel_body">
+          <p>Your Second Phone needs access to your webcam, click the button below to allow access.</p>
+          <button ng-click="initGum();">Get Webcam Access</button>
+        </div>
+      </div>
+      <div id="setup-step-2" ng-show="current_step == 2" class="panel">
+        <header>
+          <h4>Step 2: Pick a name for the conversation!</h4>
+        </header>
+        <div class="panel_body">
+          <p>Here you can pick a specific name for your conversation, this makes you easier to find. If you don't want to pick a name, that is okay, you'll just get a random one.</p>
+          <div class="row">
+            <div class="large-6 columns" style="margin-bottom:1em;">
+              <input type="text" ng-model="convo_name" placeholder="Conversation Name" ng-class="{ error: !valid_convo_name }">
+            </div>
+          </div>
+          <div class="row">
+            <div class="large-6 columns">
+              <button class="expand" ng-click="launchRoom()">Let's Go!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

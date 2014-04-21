@@ -4,16 +4,36 @@ block css
 	link(rel="stylesheet", href="/static/bower_components/nprogress/nprogress.css")
 
 block main
-	.row
-		if skipIntro && compatible_browser
-			.large-12.columns#main_content
-				//- client side app will load here
-		else
-			include includes/intro
+	.row(ng-app="ysp")
+		.large-12.columns#main_content(ng-view)
+			.row
+				.large-6.columns
+					.panel.animated#videochat
+						header
+							h4
+								<i class="fa fa-video-camera"></i>&nbsp;Video Chat
+						.panel_body
+							p Your Second Phone allows you to chat face-to-face with anyone. Simply create a session, send your friend the link and chat for as long as you need, it's <b>free!</b>
+				.large-6.columns
+					.panel.animated#noaccount
+						header
+							h4
+								<i class="fa fa-magic"></i>&nbsp;No Account
+						.panel_body
+							p You don't need to have an account to use Your Second Phone. Once a session is created, the link to it will last for 24 hours, but the call can last much longer.
+			.row
+				.large-12.large-centered.columns
+					.panel.error#incompatible_browser
+						header
+							h4 <i class="fa fa-exclamation-triangle"></i>&nbsp;JavaScript is required!
+						.panel_body
+							p JavaScript is required for this application to work. I promise I won't do anything nefarious; you can see for yourself! (<a href="http://git.io/gWSi9w">Look at my source code!</a>)
 
 block js
-	if compatible_browser
-		script(src="/static/js/plugin/webrtc_adapter.js")
-		script(src="/static/js/lib/loglevel.min.js")
-		script(src="/static/bower_components/nprogress/nprogress.js")
-		script(src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.min.js", data-main="/static/js/root.js")
+	script(src="/static/js/plugin/webrtc_adapter.js")
+	script(src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js")
+	script(src="//code.angularjs.org/1.2.15/angular-sanitize.min.js")
+	script(src="//code.angularjs.org/1.2.15/angular-route.min.js")	
+	script(src="/static/js/lib/peer/0.3.8/peer.min.js")
+	script(src="/static/js/lib/chance/0.5.6/chance.min.js")
+	script(src="/static/js/src/ysp-main.js")
