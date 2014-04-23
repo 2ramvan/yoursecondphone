@@ -385,6 +385,18 @@ body ul {
   list-style-position: outside;
   margin-left: 20px;
 }
+body video {
+  width: 100%;
+}
+body video#mirror {
+  margin: 1em;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  width: 100px;
+  position: absolute;
+}
+body video#partner {
+  background-color: rgba(0, 0, 0, 0.4);
+}
 body div#ad {
   position: fixed;
   bottom: 0;

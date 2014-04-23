@@ -19,10 +19,6 @@ basic.index = function(req, res){
 	res.locals.skipIntro = false;
 	res.locals.show_ad = true;
 
-	if (!!req.session.sid) {
-		res.locals.skipIntro = true;
-	}
-
 	res.render("index", {
 		page_id: "main"
 	});

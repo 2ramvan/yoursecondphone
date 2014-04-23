@@ -3,24 +3,10 @@ process.title = "Your Second Phone - web-worker.js";
 // Libraries
 var express = require("express"),
 	fs = require("fs"),
-	spdy = require("spdy"),
-	PeerServer = require('peer').PeerServer;
+	spdy = require("spdy");
 
 var basic = require("./basic.js"),
 	middleware = require("./middleware.js");
-
-var peer_server = new PeerServer({ 
-	port: 9090,
-	ssl: {
-		key: fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/server.unencrypted.key"),
-		cert: fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/chat_ysp_im.crt"),
-		ca: [
-			fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/AddTrustExternalCARoot.crt"),
-			fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/COMODORSAAddTrustCA.crt"),
-			fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/COMODORSADomainValidationSecureServerCA.crt")
-		]
-	}
-});
 
 var server = express();
 
@@ -31,7 +17,7 @@ server.locals = {
 };
 
 // Set the views directory
-server.set('views', root_dir + "/system/views");
+server.set('views', "./system/views");
 
 // Set the view engine to jade
 server.set("view engine", "jade");
@@ -50,7 +36,7 @@ server.use(middleware.set_strict_transport_security());
 server.use(express.compress());
 
 // Set the static resoureces directory
-server.use(express.static(root_dir + "/public"));
+server.use(express.static("./public"));
 
 // Let's do some logging
 server.use(express.logger());	
