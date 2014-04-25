@@ -6,6 +6,7 @@
 	.constant("negotiator_host", "negotiate.ysp.im")
 	.constant("negotiator_port", 9091)
 	.constant("signaler_port", 9090)
+	.value("fullscreen", screenfull)
 
 	.config(["$routeProvider", function($routeProvider) {
 		

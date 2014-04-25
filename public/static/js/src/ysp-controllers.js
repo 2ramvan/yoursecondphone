@@ -18,6 +18,7 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 	.controller("ErrorCtrl", ["$log", "$scope", "$routeParams", function($log, $scope, $routeParams){
 		var error_descriptions = {
 			"no-webcam": "Your Second Phone was denied access to the webcam!",
+			"server-error": "Your Second Phone is unable to communicate with the server. Please try again in a few minutes.",
 			"browser-incompatible": "Your browser is not capable of making video calls, please use the latest version of <a target='_blank' href='https://www.google.com/chrome'>Google Chrome</a>, <a target='_blank' href='https://www.mozilla.org/firefox'>Firefox</a> or <a target='_blank' href='http://www.opera.com/'>Opera</a>",
 			"unavailable-id": "The conversation ID you were attempting to use is not available."
 		};
@@ -88,10 +89,37 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer){
+	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer, fullscreen){
 
 		$scope.room_id = $routeParams.room_id;
 		$scope.peers = [];
+
+		$scope.isFullscreen = false;
+
+		$scope.getNumPeers = function() {
+			var nums = ["zero", "one", "two", "three"];
+			return nums[$scope.peers.length];
+		}
+
+		$scope.getColumnSize = function() {
+			var nums = ["large-12", "large-12", "large-6", "large-4"];
+			return nums[$scope.peers.length];
+		}
+
+		$scope.goFullscreen = function() {
+			fullscreen.request(document.querySelector("div#all-streams"));
+			$scope.$safeApply();
+		}
+
+		document.addEventListener(fullscreen.raw.fullscreenchange, function() {
+			$scope.$safeApply();
+		});
+
+		$scope.$watch(function() {
+			return fullscreen.isFullscreen;
+		}, function(newVal) {
+			$scope.isFullscreen = newVal;
+		});
 
 		// preflight check
 		async.waterfall([
@@ -132,8 +160,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 					$log.debug("mc(%s) arrived!", mc.peer);
 					var dc = dc_pool[mc.peer];
 					delete dc_pool[mc.peer];
-					$scope.peers.push(new PeerWrapper.forgeFromConnections(dc, mc));
-					$scope.$safeApply();
+
+					var new_peer = PeerWrapper.forgeFromConnections(dc, mc);
+					attachEventsAndPush(new_peer);
 				}
 			});
 
@@ -146,25 +175,47 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 					var mc = mc_pool[dc.peer];
 					delete mc_pool[dc.peer];
 
-					var new_peer = new PeerWrapper.forgeFromConnections(dc, mc);
-					new_peer.on("close", function(id) {
-						$scope.peers = $scope.peers.filter(function(peer) {
-							return peer.id != id;
-						});
-						$scope.$safeApply();
-					});
-
-					$scope.peers.push(new PeerWrapper.forgeFromConnections(dc, mc));
-					$scope.$safeApply();
+					var new_peer = PeerWrapper.forgeFromConnections(dc, mc);
+					attachEventsAndPush(new_peer);
 				}
+			});
+
+			// this is the entry point for all peers, existing and new
+			function attachEventsAndPush(peerWrapper){
+
+				// once the peer closes up shop, lets do the same and disconnect all events and such
+				peerWrapper.once("close", function(id) {
+					$log.debug("peer(%s) closed, pruning...", id);
+
+					// remove it from the array
+					$scope.peers = $scope.peers.filter(function(peer) {
+						return peer.id != id;
+					});
+					$scope.$safeApply();
+				});
+
+				$scope.peers.push(peerWrapper);
+				$scope.$safeApply();
+			}
+
+			// this is the primary way of knowing when someone has left
+			negotiator.on("peer_left", function(id) {
+				
+				$scope.peers.forEach(function(peer, index, all_peers){
+					if(peer.id == id){
+						peer.close();
+						all_peers.splice(index, 1);
+					}
+				});
+
 			})
 
-			$scope.peers = roomies.map(function(peer_id) {
-				return new PeerWrapper(peer_id);
+			roomies.forEach(function(peer_id, index, roomies_internal_ref) {
+				var new_peer = new PeerWrapper(peer_id);
+				attachEventsAndPush(new_peer);
 			});
-			$scope.$safeApply();
 
-			global.foo = $scope;
+			global.room_scope = $scope;
 		});
 
 	}]);

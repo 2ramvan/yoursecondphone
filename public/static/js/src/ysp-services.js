@@ -15,7 +15,7 @@ o888o
                                         
  */
 
-	.service("peer", ["$log", "negotiator_host", "signaler_port", function($log, negotiator_host, signaler_port) {
+	.service("peer", ["$log", "negotiator_host", "signaler_port", "ApplicationError", function($log, negotiator_host, signaler_port, ApplicationError) {
 		var peer = new Peer({
 			host: negotiator_host,
 			port: signaler_port,
@@ -31,7 +31,8 @@ o888o
 		});
 
 		peer.on("error", function(err) {
-			$log.error("main peer error: ", err);
+			$log.error("main peer error: ", err.type, err);
+			new ApplicationError(err.type);
 		});
 
 		peer.on("connection", function() {
@@ -41,6 +42,8 @@ o888o
 		peer.on("call", function() {
 			$log.debug("main peer incoming call");
 		});
+
+		global.pr = peer;
 
 		return peer;
 	}])
@@ -82,6 +85,10 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 	.factory("negotiator", ["$log", "_socket", "ApplicationError", function($log, _socket, ApplicationError) {
 		var is_ready_state = false;
 		var exports = new EventEmitter();
+
+		_socket.on("peer_left", function(id) {
+			exports.emit("peer_left", id);
+		})
 
 		function advertise_peer_id(peer_id){
 			$log.debug("advertising peer_id to negotiator...");
@@ -137,48 +144,68 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
                                                                                                                                
  */
 
-	.factory("PeerWrapper", ["$log", "peer", "GumService", "chance", "$interval", "$timeout", function($log, peer, GumService, chance, $interval, $timeout) {
+	.factory("PeerWrapper", ["$log", "peer", "GumService", "chance", "$interval", "$timeout", "negotiator",
+	 function($log, peer, GumService, chance, $interval, $timeout, negotiator) {
 
 		var senders = {
 			"event": function() {
+				// lets send an event to a remote peer
+
 				var msg = {};
 				var args = Array.prototype.slice.call(arguments);
-				msg.type = "event";
-				msg.event_name = args.shift();
+				msg.type = "event"; // yup, its and event
+				msg.event_name = args.shift(); // pull off the event name
 
+				// if there is a function at the end of the arguments
 				if(typeof args[args.length - 1] == "function"){
+					// pull it off
 					var callback = args.pop();
+
+					// give it an id
 					var cb_id = chance.string({ length: 20, pool: "abcdefghijklmnopqrstuvwxyz" });
-					this.waiting_cbs[cb_id] = callback;
-					msg.cb_id = cb_id;
+
+					// store it for later
+					this.waiting_cbs[cb_id] = callback; // this refers to the peerwrapper just to avoid confusion
+					msg.cb_id = cb_id; // make sure the receiver knows the callback to call
 				}
 
 				msg.args = args;
+
+				// happy trails event!
 				this.dc.send(msg);
 			}
 		}
 
-		var calculatePeerHealth = function(round_trip_ms) {
-			return 100 - ((100/2500) * round_trip_ms);
-		}
-
 		function PeerWrapper(peer_id, dc, mc){
 			var self = this;
-			var timeouts = 0;
+
+			// keep track of consecutive dc errors
+			// if the ticker reaches 10, kill
+			var accumulated_dc_errors = 0;
+
+			// keep track of peer health via measuring time of round trip pings
 			this.peerConnectionHealth = 100;
 
 			this.id = peer_id;
+
+			// remote callbacks waiting queue
 			this.waiting_cbs = {};
-			this.dc = dc || peer.connect(peer_id);
-			this.mc = mc || peer.call(peer_id, GumService.getMediaStream());
+
+			this.dc = dc || peer.connect(peer_id); // either store passed in dataconnection or connect
+																						 // to the peer
+			this.mc = mc || peer.call(peer_id, GumService.getMediaStream()); // same here
+			this.ms = null; // mediastream goes here
 
 			// MediaConnection handlers
 			this.mc.on("stream", function(stream) {
 				$log.debug("peer-mc(%s) 'stream' event", self.id);
+				self.ms = stream;
 				self.emit("stream", stream);
 			});
 
-			// WebRTC close events are unreliable - use heartbeats
+			// lets listen for dataconnection close
+			// no need to listen to two close events
+			// 
 			// this.mc.on("close", function() {
 			// 	$log.debug("peer-mc(%s) closed", self.id);
 			// 	self.emit("close", "mc");
@@ -191,10 +218,16 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
 			// DataConnection handlers
 			this.dc.on("data", function(data) {
+				accumulated_dc_errors = 0;
+
 				if(typeof data == "object"){
 					if(data.type == "event"){
+
+						// if there is a callback_id create a callback function
+						// that will acknowledge
 						if(!!data.cb_id){
 							var cb = function() {
+								// all pretty self-explanatory
 								var msg = { type: "cb", cb_id: data.cb_id };
 
 								var args = Array.prototype.slice.call(arguments);
@@ -205,19 +238,23 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 						}
 
 						var args = data.args || [];
-						args.push(cb);
-						args.unshift(data.event_name);
+						args.push(cb || angular.noop); // push the callback to the end
+						args.unshift(data.event_name); // push the event name to the beginning
 
+						// emit that sucka!!
 						self.emit.apply(self, args);
 					}
 
+					// hooray! the callback has been acknowledged
 					if(data.type == "cb"){
+						// call it and remove it from the queue
 						(self.waiting_cbs[data.cb_id] || angular.noop).apply(self, data.args);
 						delete self.waiting_cbs[data.cb_id];
 					}
 
+					// send this back, pronto!!
 					if(data.type == "heartbeat"){
-						self.dc.send({ type: "heartbeat_reply" });
+						self.dc.send({ type: "heartbeat_reply", hb_id: data.hb_id });
 					}
 				}
 
@@ -229,36 +266,34 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 				self.emit("open");
 			});
 
-			// WebRTC close events are unreliable - using heartbeats instead.
-			// this.dc.on("close", function() {
-			// 	$log.debug("peer-dc(%s) close", self.id);
-			// 	self.emit("close", "dc");
-			// });
-
-			this.dc.on("error", function(err) {
-				$log.error("peer-dc(%s)", self.id);
-				self.emit("error-dc", err);
+			this.dc.on("close", function() {
+				$log.debug("peer-dc(%s) close", self.id);
+				self.emit("close", self.id);
 			});
 
-			var heartbeat = $interval(function() {
-				var timeoutAfter = 2000;
-				// Let's send heartbeats for reliable termination of dead clients
-				
-				var killer = $timeout(function() {
-					var timeoutsAllowed = 2;
-					// lets keep track of timeouts and officially close after 3 consecutive timeouts
-					// not trying to jump the gun and kill peers at the first sign of trouble
-					if(timeouts >= timeoutsAllowed){
-						if(!!heartbeat){
-							killHeartbeat();
-							$log.error("peer(%s) timed out. closing connection...", self.id);
-							self.close("timed-out");
-						}
-					}else{
-						self.peerConnectionHealth = 0;
-						$log.warn("peer(%s) timed out. giving the peer %d more chance(s) to reply", self.id, timeoutsAllowed - timeouts);
-						timeouts++;
-					}
+			this.dc.on("error", function(err) {
+				accumulated_dc_errors += 1;
+				$log.error("peer-dc(%s)", self.id);
+				self.emit("error-dc", err);
+
+				if(accumulated_dc_errors > 10){
+					self.close();
+				}
+			});
+
+			var hb_timers = {};
+
+			this.heartbeat = $interval(function() {
+				var timeoutAfter = 5000;
+
+				// for more accurate reporting give all heartbeats an id
+				var heartbeat_id = chance.string({ length: 10, pool: "abcdefghijklmnopqrstuvwxyz" });
+
+				// after 5 seconds the heartbeat obviously isn't coming back
+				var give_up = $timeout(function() {
+
+					delete hb_timers[heartbeat_id];
+
 				}, timeoutAfter, self); //Give the peer 2 seconds to reply;
 
 				self.dc.once("data", function(data) {
@@ -266,11 +301,12 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 						// mark the end time
 						var end = Date.now();
 
-						// reset timeouts counter
-						timeouts = 0;
+						// get start
+						var start = hb_timers[data.hb_id];
+						delete hb_timers[data.hb_id];
 
 						// cancel the execution
-						$timeout.cancel(killer);
+						$timeout.cancel(give_up);
 
 						// calculate peer connection health
 						var round_trip_time = (end - start);
@@ -281,44 +317,66 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 					}
 				});
 
-				function killHeartbeat(){
-					$interval.cancel(heartbeat);
-					heartbeat = undefined;
-				}
-
 				// send the heartbeat
-				self.dc.send({ type: "heartbeat" });
+				self.dc.send({ type: "heartbeat", hb_id: heartbeat_id });
 
 				// mark the start time
-				var start = Date.now();
+				hb_timers[heartbeat_id] = Date.now();
 			}, 1000, this);
 		}
 		PeerWrapper.prototype = _.clone(EventEmitter.prototype);
 
 		PeerWrapper.forgeFromConnections = function(dc, mc) {
+			// this will be used to create a PeerWrapper from just the
+			// incoming connections
 
+			// answer the call automatically
 			mc.answer(GumService.getMediaStream());
 
+			// do i really need a comment for this
 			return new PeerWrapper(dc.peer, dc, mc);
 		};
 
 		PeerWrapper.prototype.send = function() {
 			var self = this;
 			var args = Array.prototype.slice.call(arguments);
+
+			// pull the send type off of the arguments
 			var send_type = args.shift();
 
+			// check if sender is valid
 			if(!senders[send_type]){
+
+				// this is mostly an internal api, so misusing it is inexcusable
 				throw new Error("Invalid Sender!");
 			}else{
+
+				// call the sender
 				senders[send_type].apply(self, args);
 			}
 		}
 
 		PeerWrapper.prototype.close = _.once(function() {
+			var self = this;
+
+			// log for science
 			$log.debug("close called...");
-			this.emit("close", this.id);
+
+			// cancel the heartbeat
+			$interval.cancel(this.heartbeat);
+
+			// shutdown all connections
 			this.mc.close();
 			this.dc.close();
+
+			// let everyone know this peer is done for
+			this.emit("close", this.id);
+
+			// give everyone time to receive the 'close' event
+			// then detach all listeners
+			$timeout(function() {
+				self.removeAllListeners();
+			}, 500);
 		});
 
 		return PeerWrapper;

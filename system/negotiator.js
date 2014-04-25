@@ -99,7 +99,7 @@ negotiator.sockets.on("connection", function(socket) {
 
 	socket.on("peer_id", function set_peer_id(peer_id, ack) {
 
-		console.log("setting peer_id: %s", peer_id);
+		console.log("New Peer (%s)", peer_id);
 
 		async.waterfall([
 			function(callback) {
@@ -122,6 +122,8 @@ negotiator.sockets.on("connection", function(socket) {
 				socket.get("peer_id", callback);
 			},
 			function(peer_id, callback) {
+				console.log("Peer (%s) leaving '%s'", peer_id, room_id);
+
 				if(room_cache.has(room_id)){
 					var room = room_cache.get(room_id);
 
@@ -189,6 +191,12 @@ negotiator.sockets.on("connection", function(socket) {
 				return ack(err);
 			}
 
+			console.log("Peer (%s) joining '%s'", peer_id, room.id);
+
+			// we don't need to tell the room that this peer has joined
+			// because we just pass the new peer a list of all people
+			// in the room and he automatically connects
+			// 
 			return ack(null, room.getPeers(peer_id));
 		})
 
@@ -206,6 +214,8 @@ negotiator.sockets.on("connection", function(socket) {
 						room.broadcast(peer_id, "peer_left", peer_id);
 					}
 				});
+
+				console.log("Peer (%s) disconnected", peer_id);
 
 				setTimeout(function() {
 					callback(null, peer_id);

@@ -3,6 +3,30 @@
 	
 	angular.module("ysp-directives", ["btford.socket-io"])
 
+	.directive("peer", ["$log", function($log) {
+		
+		return {
+			restrict: "E",
+			scope: {
+				peer: "=info"
+			},
+			link: function(scope, element, attrs) {
+				var video_window = element.children()[0];
+
+				if(!!scope.peer.ms){
+					attachMediaStream(video_window, scope.peer.ms);
+				}else{
+					scope.peer.once("stream", function() {
+						attachMediaStream(video_window, scope.peer.ms);
+					});
+				}
+
+			},
+			template: "<video autoplay class='peer_window' src></video>"
+		}
+
+	}])
+
 	.directive("mirror", ["$log", "GumService", function($log, GumService) {
 		
 		global.GumService = GumService;
@@ -21,11 +45,11 @@
 				});
 
 				GumService.on("inactive", function() {
-					// video_window.
+					video_window.src
 				});
 
 			},
-			template: "<video autoplay id='mirror' src></video>"
+			template: "<video autoplay id='mirror' src></video><div class='cf'></div>"
 		}
 	}])
 

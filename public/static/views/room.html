@@ -1,19 +1,29 @@
 <div id="root-view">
 	<div class="panel">
 		<header>
-			<h4><i class="fa fa-video-camera"></i>&nbsp;ID:&nbsp;{{ room_id }}</h4>
+			<div class="row">
+				<div class="large-6 columns">
+					<h4><i class="fa fa-video-camera"></i>&nbsp;ID:&nbsp;{{ room_id }}</h4>
+				</div>
+				<div class="large-6 columns">
+					<ul class="button-group no-margin right">
+						<li><button class="small no-margin" ng-click="goFullscreen()"><i class="fa fa-arrows-alt"></i></button></li>
+					</ul>
+				</div>
+			</div>
 		</header>
 		<div class="panel_body">
-			<div class="row collapse">
-				<div class="large-8 columns">
-					<div id="mirror-container">
-						<mirror></mirror>
-					</div>
-					<div id="partner-container">
-						<video id="partner" autoplay></video>
-					</div>
+			<div id="all-streams" ng-class="{ fullscreen: isFullscreen }">
+				<div id="mirror-container">
+					<mirror></mirror>
 				</div>
-				<div class="large-4 columns">
+				<div id="peer-containers" ng-class="getNumPeers()" class="row collapse">
+					<div id="waiting-for-peers">
+						<h4><i class="fa fa-coffee"></i>&nbsp;Waiting for people to join...</h4>
+					</div>
+					<div class="peer-container columns" ng-repeat="peer in peers" ng-class="getColumnSize()">
+						<peer info="peer"></peer>
+					</div>
 				</div>
 			</div>
 		</div>
