@@ -89,30 +89,62 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer, fullscreen){
+	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "chance", "$rootScope", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer, fullscreen, chance, $rootScope){
 
 		$scope.room_id = $routeParams.room_id;
 		$scope.peers = [];
+		$scope.messages = [];
+		$scope.draft = "";
 
 		$scope.isFullscreen = false;
 
+		// ng-class helper that plainly states the number of peers connected
 		$scope.getNumPeers = function() {
-			var nums = ["zero", "one", "two", "three"];
+			var nums = ["zero", "one", "two"];
 			return nums[$scope.peers.length];
 		}
 
+		// ng-class helper that helps the peer holders determine the correct column size
 		$scope.getColumnSize = function() {
-			var nums = ["large-12", "large-12", "large-6", "large-4"];
+			var nums = ["large-12", "large-12", "large-6"];
 			return nums[$scope.peers.length];
 		}
 
+		// goFullscreen if you need help determining what this does, study code a bit more
 		$scope.goFullscreen = function() {
 			fullscreen.request(document.querySelector("div#all-streams"));
 			$scope.$safeApply();
 		}
 
-		document.addEventListener(fullscreen.raw.fullscreenchange, function() {
+		$scope.sendMessage = function() {
+			if(!!$scope.draft){
+				if(!!$scope.peers.length){
+					async.each($scope.peers, function(peer, cb) {
+						peer.send("message", $scope.draft);
+						cb(null);
+					}, function(err) {
+						$scope.messages.push({
+							from: peer.id,
+							content: $scope.draft,
+							time_received: new Date()
+						});
+
+						$scope.draft = "";
+						$log.debug("Message sent!");
+					})
+				}
+			}
+		}
+
+		// apply the scope when fullscreen state changes
+		$(document).on(fullscreen.raw.fullscreenchange, function() {
 			$scope.$safeApply();
+		});
+
+		// here is where we tear down
+		$rootScope.$on("$routeChangeStart", function() {
+			negotiator.leave_room($routeParams.room_id);
+			$(document).off(fullscreen.raw.fullscreenchange);
 		});
 
 		$scope.$watch(function() {
@@ -123,24 +155,31 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
 		// preflight check
 		async.waterfall([
-			GumService.isInvoked,
-			function(isGumInvoked, callback) {
-				if(isGumInvoked)
-					return callback(null);
-				else
-					GumService.once("active", function() {
-						callback(null);
-					});
-					GumService.invoke();
-			},
 			function(callback) {
-				if(negotiator.isReady()){
+				// lets lump gumservice init and negotiator init in one parallel function
+				async.parallel([
+					function(callback) {
+						if(GumService.isInvoked()){
+							return callback(null);
+						}else{
+							GumService.once("active", function() {
+								return callback(null);
+							});
+							GumService.invoke();
+						}
+					},
+					function(callback) {
+						if(negotiator.isReady()){
+							callback(null);
+						}else{
+							negotiator.once("ready", function() {
+								callback(null);
+							});
+						}
+					}
+				], function(err) {
 					callback(null);
-				}else{
-					negotiator.once("ready", function() {
-						callback(null);
-					});
-				}
+				});
 			},
 			function(callback) {
 				negotiator.join_room($scope.room_id, callback);
@@ -180,17 +219,45 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 				}
 			});
 
+			var colors = ["green", "blue", "purple", "orange", "red"];
+			var taken_colors = [];
+
 			// this is the entry point for all peers, existing and new
 			function attachEventsAndPush(peerWrapper){
 
+				// pick a color for the peer
+				do {
+					peerWrapper.color_code = chance.pick(colors);
+				}while(_.contains(taken_colors, peerWrapper.color_code));
+
+				taken_colors.push(peerWrapper.color_code);
+
 				// once the peer closes up shop, lets do the same and disconnect all events and such
 				peerWrapper.once("close", function(id) {
+
+					// relinquish the color
+					var i = taken_colors.indexOf(peerWrapper.color_code);
+					taken_colors.splice(i, 1);
+
 					$log.debug("peer(%s) closed, pruning...", id);
 
 					// remove it from the array
 					$scope.peers = $scope.peers.filter(function(peer) {
 						return peer.id != id;
 					});
+					$scope.$safeApply();
+				});
+
+				peerWrapper.on("message", function(message) {
+					// form the message
+					var msg = {};
+
+					msg.color_code = peerWrapper.color_code;
+					msg.content = message;
+					msg.time_received = new Date();
+					msg.from = peerWrapper.id;
+
+					$scope.messages.push(msg);
 					$scope.$safeApply();
 				});
 

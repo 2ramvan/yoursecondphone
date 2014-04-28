@@ -65,7 +65,7 @@ RoomAbstract.prototype.removePeer = function(peer_id) {
 RoomAbstract.prototype.getPeers = function(exclude) {
 	return this.peers.filter(function(peer_id) {
 		return peer_id != exclude;
-	})
+	});
 }
 RoomAbstract.prototype.isEmpty = function() {
 	return !this.peers.length;
@@ -98,6 +98,10 @@ var signaler = PeerServer({
 negotiator.sockets.on("connection", function(socket) {
 
 	socket.on("peer_id", function set_peer_id(peer_id, ack) {
+
+		if(!peer_id.match(/^\w{1,64}$/)){
+			return ack("invalid-peer-id");
+		}
 
 		console.log("New Peer (%s)", peer_id);
 
@@ -147,7 +151,7 @@ negotiator.sockets.on("connection", function(socket) {
 
 				// First we need the peer_id it should be attached to the socket
 				socket.get("peer_id", function(err, peer_id) {
-					if(err)
+					if(err || !peer_id)
 						return callback("no-peer-id");
 
 					callback(null, peer_id);

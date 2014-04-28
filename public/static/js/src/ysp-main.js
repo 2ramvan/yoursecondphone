@@ -32,6 +32,10 @@
 	}])
 
 	.run(["$log", "peer", "negotiator", function($log, peer, negotiator) {
+		// lets expose a global toolbox and settings that can be modified in order
+		// to debug things like heartbeats and stuff.
+		global.ysp_debug = {};
+
 		if(peer.open){
 			negotiator.advertise_peer_id(peer.id);
 		}else{

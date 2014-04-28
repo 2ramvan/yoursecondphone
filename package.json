@@ -23,7 +23,10 @@
     "peer": "^0.2.5",
     "socket.io": "^0.9.16"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodeunit": "^0.8.6",
+    "socket.io-client": "^0.9.16"
+  },
   "scripts": {
     "test": "echo \"no tests available\""
   },

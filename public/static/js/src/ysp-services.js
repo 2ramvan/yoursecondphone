@@ -119,12 +119,19 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			}
 		}
 
+		function leave_room(room_id) {
+			if(is_ready_state){
+				_socket.emit("leave_room", room_id);
+			}
+		}
+
 		function isReady() {
 			return is_ready_state;
 		}
 
 		exports.advertise_peer_id = advertise_peer_id;
 		exports.join_room = join_room;
+		exports.leave_room = leave_room;
 		exports.isReady = isReady;
 
 		return exports;
@@ -173,6 +180,13 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
 				// happy trails event!
 				this.dc.send(msg);
+			},
+			message: function(content) {
+				var msg = {};
+				msg.type = "message";
+				msg.content = content;
+
+				this.dc.send(msg);
 			}
 		}
 
@@ -182,9 +196,6 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 			// keep track of consecutive dc errors
 			// if the ticker reaches 10, kill
 			var accumulated_dc_errors = 0;
-
-			// keep track of peer health via measuring time of round trip pings
-			this.peerConnectionHealth = 100;
 
 			this.id = peer_id;
 
@@ -202,14 +213,6 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 				self.ms = stream;
 				self.emit("stream", stream);
 			});
-
-			// lets listen for dataconnection close
-			// no need to listen to two close events
-			// 
-			// this.mc.on("close", function() {
-			// 	$log.debug("peer-mc(%s) closed", self.id);
-			// 	self.emit("close", "mc");
-			// });
 
 			this.mc.on("error", function(err) {
 				$log.error("peer-mc(%s) error: ", self.id, err);
@@ -256,6 +259,10 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 					if(data.type == "heartbeat"){
 						self.dc.send({ type: "heartbeat_reply", hb_id: data.hb_id });
 					}
+
+					if(data.type == "message"){
+						self.emit("message", data.content);
+					}
 				}
 
 				self.emit("data", data);
@@ -280,49 +287,6 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 					self.close();
 				}
 			});
-
-			var hb_timers = {};
-
-			this.heartbeat = $interval(function() {
-				var timeoutAfter = 5000;
-
-				// for more accurate reporting give all heartbeats an id
-				var heartbeat_id = chance.string({ length: 10, pool: "abcdefghijklmnopqrstuvwxyz" });
-
-				// after 5 seconds the heartbeat obviously isn't coming back
-				var give_up = $timeout(function() {
-
-					delete hb_timers[heartbeat_id];
-
-				}, timeoutAfter, self); //Give the peer 2 seconds to reply;
-
-				self.dc.once("data", function(data) {
-					if(data.type == "heartbeat_reply"){
-						// mark the end time
-						var end = Date.now();
-
-						// get start
-						var start = hb_timers[data.hb_id];
-						delete hb_timers[data.hb_id];
-
-						// cancel the execution
-						$timeout.cancel(give_up);
-
-						// calculate peer connection health
-						var round_trip_time = (end - start);
-						self.peerConnectionHealth = Math.round(100 - (( 100 / timeoutAfter ) * round_trip_time));
-
-						// log, for science
-						// $log.debug("peer heartbeat!\nround trip: %dms\nconnection health: %d", round_trip_time, self.peerConnectionHealth);
-					}
-				});
-
-				// send the heartbeat
-				self.dc.send({ type: "heartbeat", hb_id: heartbeat_id });
-
-				// mark the start time
-				hb_timers[heartbeat_id] = Date.now();
-			}, 1000, this);
 		}
 		PeerWrapper.prototype = _.clone(EventEmitter.prototype);
 
@@ -362,9 +326,6 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 			// log for science
 			$log.debug("close called...");
 
-			// cancel the heartbeat
-			$interval.cancel(this.heartbeat);
-
 			// shutdown all connections
 			this.mc.close();
 			this.dc.close();
@@ -376,6 +337,8 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 			// then detach all listeners
 			$timeout(function() {
 				self.removeAllListeners();
+				self.dc.removeAllListeners();
+				self.mc.removeAllListeners();
 			}, 500);
 		});
 

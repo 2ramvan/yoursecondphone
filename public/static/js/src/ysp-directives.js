@@ -22,7 +22,7 @@
 				}
 
 			},
-			template: "<video autoplay class='peer_window' src></video>"
+			template: "<video autoplay class='peer_window'></video><div class='peer_color' ng-class='peer.color_code'></div>"
 		}
 
 	}])
@@ -49,7 +49,7 @@
 				});
 
 			},
-			template: "<video autoplay id='mirror' src></video><div class='cf'></div>"
+			template: "<video autoplay id='mirror' muted='muted'></video><div class='cf'></div>"
 		}
 	}])
 

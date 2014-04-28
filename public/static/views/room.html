@@ -7,7 +7,7 @@
 				</div>
 				<div class="large-6 columns">
 					<ul class="button-group no-margin right">
-						<li><button class="small no-margin" ng-click="goFullscreen()"><i class="fa fa-arrows-alt"></i></button></li>
+						<li><button class="tiny no-margin" ng-click="goFullscreen()" title="Go Fullscreen!"><i class="fa fa-arrows-alt"></i></button></li>
 					</ul>
 				</div>
 			</div>
@@ -17,13 +17,43 @@
 				<div id="mirror-container">
 					<mirror></mirror>
 				</div>
-				<div id="peer-containers" ng-class="getNumPeers()" class="row collapse">
-					<div id="waiting-for-peers">
-						<h4><i class="fa fa-coffee"></i>&nbsp;Waiting for people to join...</h4>
-					</div>
+				<div id="waiting-for-peers" ng-hide="!!peers.length">
+					<h3><i class="fa fa-coffee"></i>&nbsp;Waiting for people to join...</h3>
+				</div>
+				<div id="peer-containers" ng-class="getNumPeers()" class="row" ng-hide="!peers.length">
 					<div class="peer-container columns" ng-repeat="peer in peers" ng-class="getColumnSize()">
 						<peer info="peer"></peer>
 					</div>
+				</div>
+			</div>
+			<div id="all-messages" ng-init="showMessages = true;">
+				<div id="all-messages-header" class="row">
+					<div class="large-6 columns">
+						<h4><i class="fa fa-comments-o"></i>&nbsp;Messages</h4>
+					</div>
+					<div class="large-6 columns" style="text-align:right;">
+						<h4 ng-click="showMessages = !showMessages"><i class="fa fa-caret-down" ng-show="showMessages">&nbsp;</i><i class="fa fa-caret-left" ng-show="!showMessages"></i></h4>
+					</div>
+				</div>
+				<div id="messages-window" ng-show="showMessages">
+					<div class="peer-message-container" ng-repeat="msg in messages">
+						<div class="peer-message" ng-class="msg.color_code">
+							<div class="row">
+								<div class="large-9 columns">
+									{{ msg.content }}
+								</div>
+								<div class="large-3 columns text-right">
+									{{ msg.time_received | date: "mediumTime" }}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="compose" ng-show="showMessages">
+					<form ng-submit="sendMessage()">
+						<input type="text" ng-model="draft" ng-disabled="!peers.length" placeholder="Send a message...">
+						<input type="submit" style="display:none;">
+					</form>
 				</div>
 			</div>
 		</div>
