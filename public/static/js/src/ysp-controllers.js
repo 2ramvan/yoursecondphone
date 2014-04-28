@@ -48,13 +48,13 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 		$scope.valid_room_name = true;
 
 		$scope.$watch("room_name", function(newVal, oldVal) {
-			if(newVal == ""){
+			if(newVal === ""){
 				$scope.valid_room_name = true;
 				return;
 			}
 
 			$scope.valid_room_name = newVal.match(/^\w(\w|-){1,20}$/);
-		})
+		});
 
 		$scope.initGum = function() {
 			GumService.once("active", function() {
@@ -62,7 +62,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 				$scope.$safeApply();
 			});
 			GumService.invoke();
-		}
+		};
 
 		$scope.launchRoom = function() {
 			$log.debug("Launching room... %s", $scope.room_name);
@@ -73,7 +73,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 
 			$location.path("/" + $scope.room_name); // Pass application over to Room
 			$scope.$safeApply();
-		}
+		};
 
 	}])
 
@@ -95,6 +95,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 		$scope.peers = [];
 		$scope.messages = [];
 		$scope.draft = "";
+		$scope.showMessages = true;
 
 		$scope.isFullscreen = false;
 
@@ -102,19 +103,19 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 		$scope.getNumPeers = function() {
 			var nums = ["zero", "one", "two"];
 			return nums[$scope.peers.length];
-		}
+		};
 
 		// ng-class helper that helps the peer holders determine the correct column size
 		$scope.getColumnSize = function() {
 			var nums = ["large-12", "large-12", "large-6"];
 			return nums[$scope.peers.length];
-		}
+		};
 
 		// goFullscreen if you need help determining what this does, study code a bit more
 		$scope.goFullscreen = function() {
 			fullscreen.request(document.querySelector("div#all-streams"));
 			$scope.$safeApply();
-		}
+		};
 
 		$scope.sendMessage = function() {
 			if(!!$scope.draft){
@@ -123,7 +124,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 						peer.send("message", $scope.draft);
 						cb(null);
 					}, function(err) {
-						$scope.messages.push({
+						pushMessageToScope({
 							from: peer.id,
 							content: $scope.draft,
 							time_received: new Date()
@@ -131,9 +132,20 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
 						$scope.draft = "";
 						$log.debug("Message sent!");
-					})
+					});
 				}
 			}
+		};
+
+		function pushMessageToScope(msg){
+			// message required fields
+			// from
+			// time_received
+			// content
+			// color_code (not-required)
+			
+
+			$scope.messages.push(msg);
 		}
 
 		// apply the scope when fullscreen state changes
@@ -257,7 +269,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 					msg.time_received = new Date();
 					msg.from = peerWrapper.id;
 
-					$scope.messages.push(msg);
+					pushMessageToScope(msg);
+					$scope.showMessages = true;
 					$scope.$safeApply();
 				});
 
@@ -275,8 +288,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 					}
 				});
 
-			})
+			});
 
+			// process peers given by the negotiator
 			roomies.forEach(function(peer_id, index, roomies_internal_ref) {
 				var new_peer = new PeerWrapper(peer_id);
 				attachEventsAndPush(new_peer);

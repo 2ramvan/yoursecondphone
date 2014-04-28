@@ -11,10 +11,10 @@ var fs = require('fs');
 var util = require('util');
 
 var ssl = {
-	key: fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/server.unencrypted.key"),
-	cert: fs.readFileSync("/Users/nkcmr/Desktop/negotiate.ysp.im/negotiate_ysp_im.crt"),
+	key: fs.readFileSync("/etc/ssl/private/server.encrypted.key"),
+	cert: fs.readFileSync("/etc/ssl/private/negotiate_ysp_im.crt"),
 	ca: [
-		fs.readFileSync("/Users/nkcmr/Desktop/negotiate.ysp.im/RapidSSL_CA.crt")
+		fs.readFileSync("/etc/ssl/certs/RapidSSL_CA.crt")
 	]
 };
 

@@ -367,6 +367,9 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 		Gum.prototype.invoke = function gum_invoke() {
 			var self = this;
 
+			if(!_.isFunction(getUserMedia))
+				return new ApplicationError("browser-incompatible");
+
 			if(!!ms && isInvoked)
 				throw new Error("Gum already invoked!");
 
@@ -401,7 +404,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 		var gum = new Gum();
 
 		gum.on("error", function() {
-			ApplicationError("no-webcam");
+			return new ApplicationError("no-webcam");
 		});
 
 		return gum;

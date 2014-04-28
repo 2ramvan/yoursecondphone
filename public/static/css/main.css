@@ -2,7 +2,7 @@ html,
 body {
   height: 100%;
 }
-*.no-margin {
+.no-margin {
   margin: 0px;
 }
 .round_all {
@@ -82,6 +82,7 @@ ul.button-group li:only-child a {
   user-select: none;
 }
 body {
+  font-size: 15px;
   color: #696969;
 }
 body div#page_content {
@@ -103,20 +104,18 @@ body header#global_header {
   text-align: center;
   background-color: #2ecc71;
   border-top: #27ae60 5px solid;
-  padding: 10px;
+  padding: 1em;
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 body header#global_header h2 {
-  font-family: 'Aldrich';
   color: white;
-  margin: 0px;
 }
 body footer#global_footer {
   margin-bottom: 100px;
-  padding: 10px;
+  padding: 1em;
   background-color: #ecf0f1;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
@@ -134,89 +133,89 @@ body footer#global_footer div#twitter {
 body footer#global_footer div#copyright {
   text-align: center;
 }
-body #all-streams #mirror-container {
-  z-index: 1;
+body #root-view #all-streams #mirror-container {
+  z-index: 10;
   position: absolute;
   width: 120px;
   margin: 1em;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 0.75em rgba(0, 0, 0, 0.5);
 }
-body #all-streams #mirror-container mirror video {
+body #root-view #all-streams #mirror-container mirror video {
   width: 100%;
   display: block;
 }
-body #all-streams #waiting-for-peers {
+body #root-view #all-streams #waiting-for-peers {
+  background-color: #696969;
   padding-top: 20%;
   height: 350px;
   text-align: center;
 }
-body #all-streams #waiting-for-peers h3 {
-  color: #696969;
+body #root-view #all-streams #waiting-for-peers h3 {
+  color: #505050 !important;
 }
-body #all-streams #peer-containers .peer-container {
+body #root-view #all-streams #peer-containers .peer-container {
   overflow: hidden;
 }
-body #all-streams #peer-containers .peer-container peer {
+body #root-view #all-streams #peer-containers .peer-container peer {
   width: 100%;
 }
-body #all-streams #peer-containers .peer-container peer .peer_window {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_window {
   display: block;
   width: 100%;
 }
-body #all-streams #peer-containers .peer-container peer .peer_color {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color {
   position: absolute;
   width: 20px;
   height: 20px;
   border: 2px solid white;
-  margin: 8px;
+  margin: 10px;
   margin-top: -30px;
-  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3);
 }
-body #all-streams #peer-containers .peer-container peer .peer_color.green {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color.green {
   background-color: #2ecc71;
 }
-body #all-streams #peer-containers .peer-container peer .peer_color.blue {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color.blue {
   background-color: #3498db;
 }
-body #all-streams #peer-containers .peer-container peer .peer_color.purple {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color.purple {
   background-color: #9b59b6;
 }
-body #all-streams #peer-containers .peer-container peer .peer_color.orange {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color.orange {
   background-color: #e67e22;
 }
-body #all-streams #peer-containers .peer-container peer .peer_color.red {
+body #root-view #all-streams #peer-containers .peer-container peer .peer_color.red {
   background-color: #e74c3c;
 }
-body #all-streams.fullscreen {
+body #root-view #all-streams.fullscreen {
   width: 100%;
   height: 750px;
   background-image: url(/static/img/nature.jpg);
   background-size: cover;
 }
-body #all-streams.fullscreen #waiting-for-peers h3 {
+body #root-view #all-streams.fullscreen #waiting-for-peers {
+  background-color: transparent;
+}
+body #root-view #all-streams.fullscreen #waiting-for-peers h3 {
   color: white !important;
 }
-body #all-streams.fullscreen #peer-containers {
+body #root-view #all-streams.fullscreen #peer-containers {
   width: 75%;
   height: 700px;
   overflow: hidden;
   margin: 25px auto 0;
 }
-body #all-streams.fullscreen #peer-containers.zero {
+body #root-view #all-streams.fullscreen #peer-containers.zero {
   height: inherit;
 }
-body #all-streams.fullscreen #peer-containers #waiting-for-peers h4 {
-  color: #ecf0f1 !important;
-}
-body #all-streams.fullscreen #peer-containers .peer-container {
+body #root-view #all-streams.fullscreen #peer-containers .peer-container {
   height: 100%;
   padding: 10px;
 }
-body #all-streams.fullscreen #peer-containers .peer-container peer {
+body #root-view #all-streams.fullscreen #peer-containers .peer-container peer {
   height: 100%;
   display: block;
 }
-body #all-streams.fullscreen #peer-containers .peer-container peer video {
+body #root-view #all-streams.fullscreen #peer-containers .peer-container peer video {
   position: relative;
   top: 50%;
   -webkit-transform: translateY(-50%);
@@ -225,47 +224,61 @@ body #all-streams.fullscreen #peer-containers .peer-container peer video {
   -o-transform: translateY(-50%);
   transform: translateY(-50%);
 }
-body #all-streams.fullscreen #peer-containers .peer-container peer .peer_color {
+body #root-view #all-streams.fullscreen #peer-containers .peer-container peer .peer_color {
   display: none;
 }
-body #all-streams.fullscreen #mirror-container mirror video {
+body #root-view #all-streams.fullscreen #mirror-container mirror video {
   width: 200px;
 }
-body #all-messages #all-messages-header {
-  padding: 1em 0px;
+body #root-view #all-messages input {
+  margin-bottom: 0px;
 }
-body #all-messages #messages-window {
-  height: 200px;
+body #root-view #all-messages #all-messages-header {
+  padding: 0px;
+  padding-top: 0.8em;
+}
+body #root-view #all-messages #all-messages-header .clickable {
+  cursor: pointer;
+}
+body #root-view #all-messages #messages-window {
+  height: 250px;
+  margin-top: 1em;
   overflow: scroll;
   background-color: white;
   margin-bottom: 1em;
   padding: 1em;
 }
-body #all-messages #messages-window .peer-message-container .peer-message {
+body #root-view #all-messages #messages-window .peer-message-container:last-child .peer-message {
+  margin-bottom: 0px;
+}
+body #root-view #all-messages #messages-window .peer-message-container .peer-message {
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   background-color: #ecf0f1;
   border-left-color: #ecf0f1;
-  border-left: 5px solid;
+  border-left: .5em solid;
   margin-bottom: 1em;
-  padding: 5px;
+  padding: .5em;
 }
-body #all-messages #messages-window .peer-message-container .peer-message.green {
+body #root-view #all-messages #messages-window .peer-message-container .peer-message.green {
   border-left-color: #2ecc71;
 }
-body #all-messages #messages-window .peer-message-container .peer-message.blue {
+body #root-view #all-messages #messages-window .peer-message-container .peer-message.blue {
   border-left-color: #3498db;
 }
-body #all-messages #messages-window .peer-message-container .peer-message.purple {
+body #root-view #all-messages #messages-window .peer-message-container .peer-message.purple {
   border-left-color: #9b59b6;
 }
-body #all-messages #messages-window .peer-message-container .peer-message.orange {
+body #root-view #all-messages #messages-window .peer-message-container .peer-message.orange {
   border-left-color: #e67e22;
 }
-body #all-messages #messages-window .peer-message-container .peer-message.red {
+body #root-view #all-messages #messages-window .peer-message-container .peer-message.red {
   border-left-color: #e74c3c;
+}
+body #root-view #all-messages #messages-window .peer-message-container .peer-message .peer-message-timestamp {
+  color: #c0cdd1;
 }
 body input[type=text],
 body input[type=password],
@@ -282,7 +295,7 @@ body div.panel {
   background: none;
   border: none;
   padding: 0px;
-  margin-bottom: 25px;
+  margin-bottom: 2em;
 }
 body div.panel.error header {
   background-color: #e74c3c;
@@ -296,7 +309,7 @@ body div.panel.error div.panel_body p {
 }
 body div.panel header {
   background-color: #2ecc71;
-  padding: 10px;
+  padding: 1em;
   border-bottom: #27ae60 solid 5px;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
@@ -311,15 +324,10 @@ body div.panel header h5,
 body div.panel header h6 {
   margin: 0px;
   color: white;
-  font-family: "Aldrich";
-}
-body div.panel header ul.button-group li a {
-  margin: 0px;
 }
 body div.panel div.panel_body {
   background-color: #ecf0f1;
-  padding: 10px;
-  font-size: 0.9em;
+  padding: 1em;
   border-top-right-radius: 0px;
   border-top-left-radius: 0px;
   border-bottom-right-radius: 5px;

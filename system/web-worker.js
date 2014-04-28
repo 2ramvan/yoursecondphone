@@ -56,11 +56,11 @@ server.use(basic.server_error);
 
 require("http").createServer(server).listen(process.env.UNSECURE_PORT || 80);
 spdy.createServer({
-	key: fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/server.unencrypted.key"),
-	cert: fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/yoursecondphone_co.crt"),
+	key: fs.readFileSync("/etc/ssl/private/server.encrypted.key"),
+	cert: fs.readFileSync("/etc/ssl/private/beta_yoursecondphone_co.crt"),
 	ca: [
-		fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/AddTrustExternalCARoot.crt"),
-		fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/COMODORSAAddTrustCA.crt"),
-		fs.readFileSync("/Users/nkcmr/Desktop/yoursecondphone_certs/COMODORSADomainValidationSecureServerCA.crt")
+		fs.readFileSync("/etc/ssl/certs/AddTrustExternalCARoot.crt"),
+		fs.readFileSync("/etc/ssl/certs/COMODORSAAddTrustCA.crt"),
+		fs.readFileSync("/etc/ssl/certs/COMODORSADomainValidationSecureServerCA.crt")
 	]
 }, server).listen(process.env.SECURE_PORT || 443);

@@ -1,4 +1,7 @@
 <div id="root-view">
+	<div id="config-container">
+		<div id="config"></div>
+	</div>
 	<div class="panel">
 		<header>
 			<div class="row">
@@ -32,17 +35,17 @@
 						<h4><i class="fa fa-comments-o"></i>&nbsp;Messages</h4>
 					</div>
 					<div class="large-6 columns" style="text-align:right;">
-						<h4 ng-click="showMessages = !showMessages"><i class="fa fa-caret-down" ng-show="showMessages">&nbsp;</i><i class="fa fa-caret-left" ng-show="!showMessages"></i></h4>
+						<h4 ng-click="showMessages = !showMessages"><i class="fa fa-caret-down clickable" ng-show="showMessages">&nbsp;</i><i class="fa fa-caret-left clickable" ng-show="!showMessages"></i></h4>
 					</div>
 				</div>
 				<div id="messages-window" ng-show="showMessages">
 					<div class="peer-message-container" ng-repeat="msg in messages">
 						<div class="peer-message" ng-class="msg.color_code">
 							<div class="row">
-								<div class="large-9 columns">
+								<div class="peer-message-body large-9 columns">
 									{{ msg.content }}
 								</div>
-								<div class="large-3 columns text-right">
+								<div class="peer-message-timestamp large-3 columns text-right">
 									{{ msg.time_received | date: "mediumTime" }}
 								</div>
 							</div>
