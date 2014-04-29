@@ -36,6 +36,8 @@
 		// to debug things like heartbeats and stuff.
 		if(!global.util.supports.audioVideo || !global.util.supports.data){
 			return new ApplicationError("browser-incompatible");
+		}else{
+			$log.debug("Browser supports all necessary components");
 		}
 
 		if(peer.open){
