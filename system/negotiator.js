@@ -97,6 +97,16 @@ var signaler = PeerServer({
 
 negotiator.sockets.on("connection", function(socket) {
 
+	socket.on("debug", function() {
+		room_cache.forEach(function(room, room_id) {
+			var peers = room.getPeers();
+			console.log("%s - %d peers", room_id, peers.length);
+			peer.forEach(function(peer) {
+				console.log("\t%s", peer);
+			});
+		});
+	});
+
 	socket.on("peer_id", function set_peer_id(peer_id, ack) {
 
 		if(!peer_id.match(/^\w{1,64}$/)){
