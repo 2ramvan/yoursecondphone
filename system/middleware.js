@@ -9,7 +9,7 @@ exports.redirect_to_secure = function(){
 			next();
 		}else {
 			debug("Unsecure request; redirecting...");
-			res.redirect(301, "https://yoursecondphone.co" + req.url);
+			res.redirect(301, "https://beta.yoursecondphone.co" + req.url);
 		}
 	}
 };
