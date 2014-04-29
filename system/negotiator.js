@@ -101,7 +101,7 @@ negotiator.sockets.on("connection", function(socket) {
 		room_cache.forEach(function(room, room_id) {
 			var peers = room.getPeers();
 			console.log("%s - %d peers", room_id, peers.length);
-			peer.forEach(function(peer) {
+			peers.forEach(function(peer) {
 				console.log("\t%s", peer);
 			});
 		});
