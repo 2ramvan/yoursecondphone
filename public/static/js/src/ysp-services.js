@@ -60,20 +60,8 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
 
  */
 
-	.factory("_socket", ["socketFactory", "negotiator_host", "negotiator_port", function(socketFactory, negotiator_host, negotiator_port) {
-		var socket = io.connect("https://" + negotiator_host + ":" + negotiator_port);
-
-		function isConnected(){
-			return socket.socket.connected;
-		}
-
-		var exports = socketFactory({
-			ioSocket: socket
-		});
-
-		exports.isConnected = isConnected;
-
-		return exports;
+	.service("_socket", ["negotiator_host", "negotiator_port", function(negotiator_host, negotiator_port) {
+		return io.connect("https://" + negotiator_host + ":" + negotiator_port);
 	}])
 
 /*
