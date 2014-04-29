@@ -31,15 +31,18 @@
 
 	}])
 
-	.run(["$log", "peer", "negotiator", function($log, peer, negotiator) {
+	.run(["$log", "peer", "negotiator", "ApplicationError", function($log, peer, negotiator, ApplicationError) {
 		// lets expose a global toolbox and settings that can be modified in order
 		// to debug things like heartbeats and stuff.
+		if(!peer.supports.audioVideo || !peer.supports.data){
+			return new ApplicationError("browser-incompatible");
+		}
 
 		if(peer.open){
-			negotiator.advertise_peer_id(peer.id);
+			negotiator.advertise_peer_id();
 		}else{
 			peer.on("open", function(id) {
-				negotiator.advertise_peer_id(id);
+				negotiator.advertise_peer_id();
 			});
 		}
 	}])

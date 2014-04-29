@@ -23,7 +23,7 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 			"unavailable-id": "The conversation ID you were attempting to use is not available."
 		};
 
-		$scope.error_id = $routeParams.err_type;
+		$scope.error_id = error_descriptions.hasOwnProperty($routeParams.error_id) ? $routeParams.error_id : "unknown-error";
 		$scope.error_description = error_descriptions[$scope.error_id] || "An unknown error has occured.";
 
 	}])

@@ -84,7 +84,7 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
                                                                                               
  */
 
-	.factory("negotiator", ["$log", "_socket", "ApplicationError", function($log, _socket, ApplicationError) {
+	.factory("negotiator", ["$log", "_socket", "ApplicationError", "peer", function($log, _socket, ApplicationError, peer) {
 		var is_ready_state = false;
 		var exports = new EventEmitter();
 
@@ -92,20 +92,23 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			exports.emit("peer_left", id);
 		})
 
-		function advertise_peer_id(peer_id){
+		function advertise_peer_id(){
 			$log.debug("advertising peer_id to negotiator...");
 
 			var cb = function(err) {
+				if(err)
+					return new ApplicationError(err);
+
 				$log.debug("peer_id successfully advertised...")
 				is_ready_state = true;
 				exports.emit("ready");
 			}
 
 			if(_socket.open){
-				_socket.emit("peer_id", peer_id, cb);
+				_socket.emit("peer_id", peer.id, cb);
 			}else{
 				_socket.once("connect", function() {
-					_socket.emit("peer_id", peer_id, cb);
+					_socket.emit("peer_id", peer.id, cb);
 				})
 			}
 		}

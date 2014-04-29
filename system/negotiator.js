@@ -98,6 +98,7 @@ var signaler = PeerServer({
 negotiator.sockets.on("connection", function(socket) {
 
 	socket.on("debug", function() {
+		console.log("-------------[ DEBUG ]-------------");
 		room_cache.forEach(function(room, room_id) {
 			var peers = room.getPeers();
 			console.log("%s - %d peers", room_id, peers.length);
@@ -105,11 +106,12 @@ negotiator.sockets.on("connection", function(socket) {
 				console.log("\t%s", peer);
 			});
 		});
+		console.log("-------------[ DEBUG ]-------------");
 	});
 
 	socket.on("peer_id", function set_peer_id(peer_id, ack) {
 
-		if(!peer_id.match(/^\w{1,64}$/)){
+		if(!peer_id || !peer_id.match(/^\w{1,64}$/)){
 			return ack("invalid-peer-id");
 		}
 
