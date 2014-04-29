@@ -104,7 +104,7 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 				exports.emit("ready");
 			}
 
-			if(_socket.open){
+			if(_socket.socket.open){
 				_socket.emit("peer_id", peer.id, cb);
 			}else{
 				_socket.once("connect", function() {
