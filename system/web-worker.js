@@ -8,6 +8,8 @@ var express = require("express"),
 var basic = require("./basic.js"),
 	middleware = require("./middleware.js");
 
+var config = require('../ysp_config.js');
+
 var server = express();
 
 server.locals = {
@@ -55,12 +57,4 @@ server.use(basic.render("not_found", 404));
 server.use(basic.server_error);
 
 require("http").createServer(server).listen(process.env.UNSECURE_PORT || 80);
-spdy.createServer({
-	key: fs.readFileSync("/etc/ssl/private/server.encrypted.key"),
-	cert: fs.readFileSync("/etc/ssl/private/beta_yoursecondphone_co.crt"),
-	ca: [
-		fs.readFileSync("/etc/ssl/certs/AddTrustExternalCARoot.crt"),
-		fs.readFileSync("/etc/ssl/certs/COMODORSAAddTrustCA.crt"),
-		fs.readFileSync("/etc/ssl/certs/COMODORSADomainValidationSecureServerCA.crt")
-	]
-}, server).listen(process.env.SECURE_PORT || 443);
+spdy.createServer(config.ssl.main_server, server).listen(process.env.SECURE_PORT || 443);

@@ -6,17 +6,11 @@ var PeerServer = require('peer').PeerServer;
 var _ = require('lodash');
 var async = require('async');
 
+var config = require('../ysp_config.js');
+
 // Internal
 var fs = require('fs');
 var util = require('util');
-
-var ssl = {
-	key: fs.readFileSync("/etc/ssl/private/server.encrypted.key"),
-	cert: fs.readFileSync("/etc/ssl/private/negotiate_ysp_im.crt"),
-	ca: [
-		fs.readFileSync("/etc/ssl/certs/RapidSSL_CA.crt")
-	]
-};
 
 var LRU = require('lru-cache');
 socket_cache = LRU({
@@ -88,11 +82,13 @@ RoomAbstract.prototype.broadcast = function() {
 	})
 }
 
-var negotiator = io.listen(9091, ssl);
+var negotiator = io.listen(9091, config.ssl.negotiator);
+negotiator.set("log level", 1);
+negotiator.set("heartbeat interval", 10);
 
 var signaler = PeerServer({
 	port: 9090,
-	ssl: ssl
+	ssl: config.ssl.negotiator
 });
 
 negotiator.sockets.on("connection", function(socket) {
