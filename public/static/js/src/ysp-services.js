@@ -1,7 +1,7 @@
 (function(global){
 	'use strict';
 	
-	angular.module("ysp-services", ["ngStorage", "btford.socket-io"])
+	angular.module("ysp-services", ["ngStorage"])
 
 /*
                                         

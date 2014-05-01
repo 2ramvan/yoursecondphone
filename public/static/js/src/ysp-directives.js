@@ -1,7 +1,7 @@
 (function(global){
 	'use strict';
 	
-	angular.module("ysp-directives", ["btford.socket-io"])
+	angular.module("ysp-directives", [])
 
 	.directive("peer", ["$log", function($log) {
 		
@@ -42,10 +42,11 @@
 
 				GumService.on("active", function(stream) {
 					attachMediaStream(video_window, stream);
+					$(element).removeClass("inactive");
 				});
 
 				GumService.on("inactive", function() {
-					video_window.src
+					$(element).addClass("inactive");
 				});
 
 			},
