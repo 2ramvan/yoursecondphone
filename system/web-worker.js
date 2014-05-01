@@ -5,10 +5,10 @@ var express = require("express"),
 	fs = require("fs"),
 	spdy = require("spdy");
 
-var basic = require("./basic.js"),
-	middleware = require("./middleware.js");
+var basic = require(__dirname + "/basic.js"),
+	middleware = require(__dirname + "/middleware.js");
 
-var config = require('../ysp_config.js');
+var config = require(__dirname + '/../ysp_config.js');
 
 var server = express();
 
@@ -19,7 +19,7 @@ server.locals = {
 };
 
 // Set the views directory
-server.set('views', "./system/views");
+server.set('views', __dirname + "/views");
 
 // Set the view engine to jade
 server.set("view engine", "jade");
@@ -38,7 +38,7 @@ server.use(middleware.set_strict_transport_security());
 server.use(express.compress());
 
 // Set the static resoureces directory
-server.use(express.static("./public"));
+server.use(express.static(__dirname + "/../public"));
 
 // Let's do some logging
 server.use(express.logger());	

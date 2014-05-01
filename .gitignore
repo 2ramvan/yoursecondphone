@@ -20,5 +20,4 @@ ssl
 
 ysp_config.js
 boot.json
-
-
+system/room_backup.json

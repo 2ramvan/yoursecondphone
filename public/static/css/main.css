@@ -91,6 +91,15 @@ body div#page_content {
 body#donate .button.share {
   margin-right: 5px;
 }
+body#about .color_red {
+  color: #c0392b;
+}
+body#about .color_green {
+  color: #27ae60;
+}
+body#about .color_yellow {
+  color: #f39c12;
+}
 body h1,
 body h2,
 body h3,
@@ -153,6 +162,22 @@ body #root-view #all-streams #waiting-for-peers {
 body #root-view #all-streams #waiting-for-peers h3 {
   color: #505050 !important;
 }
+body #root-view #all-streams #waiting-for-peers #room_link {
+  color: #b5b5b5;
+}
+body #root-view #all-streams #waiting-for-peers #room_link #instruct {
+  font-size: 1.3em;
+}
+body #root-view #all-streams #waiting-for-peers #room_link #link {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  display: table;
+  margin: .5em auto 0;
+  background-color: #505050;
+  padding: .5em;
+}
 body #root-view #all-streams #peer-containers .peer-container {
   overflow: hidden;
 }
@@ -197,6 +222,12 @@ body #root-view #all-streams.fullscreen #waiting-for-peers {
 }
 body #root-view #all-streams.fullscreen #waiting-for-peers h3 {
   color: white !important;
+}
+body #root-view #all-streams.fullscreen #waiting-for-peers div#room_link {
+  color: white;
+}
+body #root-view #all-streams.fullscreen #waiting-for-peers div#room_link #link {
+  background-color: transparent;
 }
 body #root-view #all-streams.fullscreen #peer-containers {
   width: 75%;

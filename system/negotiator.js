@@ -6,7 +6,7 @@ var PeerServer = require('peer').PeerServer;
 var _ = require('lodash');
 var async = require('async');
 
-var config = require('../ysp_config.js');
+var config = require(__dirname + '/../ysp_config.js');
 
 // Internal
 var fs = require('fs');
@@ -25,7 +25,7 @@ room_cache = LRU({
 function RoomAbstract(room_id, first_peer) {
 	if(!(this instanceof RoomAbstract)) return new RoomAbstract(room_id, first_peer);
 
-	if(!room_id.match(/^\w(\w|-){1,20}$/)){
+	if(!room_id.match(/^\w(\w|-){1,30}$/)){
 		throw "invalid-room-id";
 	}
 
@@ -33,8 +33,9 @@ function RoomAbstract(room_id, first_peer) {
 	this.peers = [];
 
 	// TODO - have a room secret that makes someone an admin of the room
-
-	this.addPeer(first_peer);
+	if(!!first_peer){
+		this.addPeer(first_peer);
+	}
 }
 RoomAbstract.prototype.addPeer = function(peer_id) {
 	if(this.peers.length < 3){

@@ -22,6 +22,10 @@
 				</div>
 				<div id="waiting-for-peers" ng-hide="!!peers.length">
 					<h3><i class="fa fa-coffee"></i>&nbsp;Waiting for people to join...</h3>
+					<div id="room_link">
+						<div class="text-center" id="instruct"><i class="fa fa-share"></i>&nbsp;Invite people to join:</div>
+						<div class="text-center" id="link">{{ room_link }}</div>
+					</div>
 				</div>
 				<div id="peer-containers" ng-class="getNumPeers()" class="row" ng-hide="!peers.length">
 					<div class="peer-container columns" ng-repeat="peer in peers" ng-class="getColumnSize()">
@@ -38,7 +42,7 @@
 						<h4 ng-click="showMessages = !showMessages"><i class="fa fa-caret-down clickable" ng-show="showMessages">&nbsp;</i><i class="fa fa-caret-left clickable" ng-show="!showMessages"></i></h4>
 					</div>
 				</div>
-				<div id="messages-window" ng-show="showMessages">
+				<div id="messages-window" ng-show="showMessages" class="pin-to-bottom">
 					<div class="peer-message-container" ng-repeat="msg in messages">
 						<div class="peer-message" ng-class="msg.color_code">
 							<div class="row">

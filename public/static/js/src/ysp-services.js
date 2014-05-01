@@ -23,27 +23,25 @@ o888o
 		});
 
 		peer.on("open", function(id) {
-			$log.debug("main peer connection open (%s)", id);
+			$log.debug("peer: main peer connection open (%s)", id);
 		});
 
 		peer.on("close", function() {
-			$log.debug("main peer connection closed");
+			$log.debug("peer: main peer connection closed");
 		});
 
 		peer.on("error", function(err) {
-			$log.error("main peer error: ", err.type, err);
+			$log.error("peer: Error! - ", err.type, err);
 			new ApplicationError(err.type);
 		});
 
 		peer.on("connection", function() {
-			$log.debug("main peer incoming connection");
+			$log.debug("peer: incoming connection");
 		});
 
 		peer.on("call", function() {
-			$log.debug("main peer incoming call");
+			$log.debug("peer: incoming call");
 		});
-
-		global.pr = peer;
 
 		return peer;
 	}])
@@ -86,16 +84,27 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			exports.emit("peer_left", id);
 		})
 
-		function advertise_peer_id(){
-			$log.debug("advertising peer_id to negotiator...");
+		_socket.on("disconnect", function() {
+			is_ready_state = false;
+		})
+
+		_socket.on("reconnect", function() {
+			advertise_peer_id(function() {
+				exports.emit("reconnect");
+			});
+		});
+
+		function advertise_peer_id(callback){
+			$log.debug("negotiator: advertising peer_id to negotiator...");
 
 			var cb = function(err) {
 				if(err)
 					return new ApplicationError(err);
 
-				$log.debug("peer_id successfully advertised...")
+				$log.debug("negotiator: peer_id successfully advertised...")
 				is_ready_state = true;
 				exports.emit("ready");
+				(callback || angular.noop)();
 			}
 
 			if(_socket.socket.connected){
@@ -111,6 +120,7 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			if(is_ready_state){
 				_socket.emit("join_room", room_id, function(err, roomies) {
 					exports.emit("join");
+					$log.debug("negotiator: joined room (%s)", room_id);
 					(cb || angular.noop).call(this, err, roomies);
 				});
 			}else{

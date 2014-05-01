@@ -1,8 +1,5 @@
 extends layout
 
-block css
-	link(rel="stylesheet", href="/static/bower_components/nprogress/nprogress.css")
-
 block main
 	.row(ng-app="ysp")
 		.large-12.columns#main_content(ng-view)
@@ -32,9 +29,8 @@ block main
 block js
 
 	//- utilities
-	script(src="/static/js/webrtc_adapter.js") 
+	script(src="/static/js/webrtc_adapter.min.js") 
 	script(src="/static/js/lib/screenfull/screenfull.min.js")
-	script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js")
 	script(src="//cdnjs.cloudflare.com/ajax/libs/async/0.7.0/async.js")
 	script(src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js")
 	script(src="/static/js/lib/eventemitter/4.2.7/eventemitter.min.js")
@@ -49,11 +45,11 @@ block js
 
 	//- 3rd party angular
 	script(src="/static/js/lib/ngstorage/0.3.0/ngstorage.min.js")
-	script(src="/static/js/lib/ngsocket/0.5.0/socket.min.js")
 	script(src="/static/js/lib/safeapply/safeapply.min.js")
 
 	//- application angular
-	script(src="/static/js/src/ysp-directives.js")
-	script(src="/static/js/src/ysp-controllers.js")
-	script(src="/static/js/src/ysp-services.js")
-	script(src="/static/js/src/ysp-main.js")
+	//- script(src="/static/js/src/ysp-directives.js")
+	//- script(src="/static/js/src/ysp-controllers.js")
+	//- script(src="/static/js/src/ysp-services.js")
+	//- script(src="/static/js/src/ysp-main.js")
+	script(src="/static/js/build/ysp.js")

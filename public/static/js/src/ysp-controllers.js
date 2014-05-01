@@ -23,7 +23,7 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 			"unavailable-id": "The conversation ID you were attempting to use is not available."
 		};
 
-		$scope.error_id = error_descriptions.hasOwnProperty($routeParams.error_id) ? $routeParams.error_id : "unknown-error";
+		$scope.error_id = error_descriptions.hasOwnProperty($routeParams.err_type) ? $routeParams.err_type : "unknown-error";
 		$scope.error_description = error_descriptions[$scope.error_id] || "An unknown error has occured.";
 
 	}])
@@ -53,7 +53,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 				return;
 			}
 
-			$scope.valid_room_name = newVal.match(/^\w(\w|-){1,20}$/);
+			$scope.valid_room_name = newVal.match(/^\w(\w|-){1,30}$/);
 		});
 
 		$scope.initGum = function() {
@@ -67,7 +67,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 		$scope.launchRoom = function() {
 			$log.debug("Launching room... %s", $scope.room_name);
 
-			if(!$scope.valid_room_name){
+			if(!$scope.valid_room_name || $scope.room_name == ""){
 				$scope.room_name = chance.word({ length: 8 });
 			}
 
@@ -92,6 +92,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "chance", "$rootScope", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer, fullscreen, chance, $rootScope){
 
 		$scope.room_id = $routeParams.room_id;
+		$scope.room_link = "http://ysp.im/#/" + $routeParams.room_id;
 		$scope.peers = [];
 		$scope.messages = [];
 		$scope.draft = "";
@@ -143,9 +144,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 			// time_received
 			// content
 			// color_code (not-required)
-			
-
 			$scope.messages.push(msg);
+			$rootScope.$broadcast("ysp:message");
 		}
 
 		// apply the scope when fullscreen state changes
@@ -156,9 +156,11 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 		// here is where we tear down
 		$rootScope.$on("$routeChangeStart", function() {
 			negotiator.leave_room($routeParams.room_id);
+			negotiator.removeAllListeners();
 			$(document).off(fullscreen.raw.fullscreenchange);
 		});
 
+		// reflect fullscreen indeicator to the scope
 		$scope.$watch(function() {
 			return fullscreen.isFullscreen;
 		}, function(newVal) {
@@ -290,13 +292,16 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
 			});
 
+			negotiator.on("reconnect", function() {
+				negotiator.join_room($scope.room_id);
+			});
+
 			// process peers given by the negotiator
 			roomies.forEach(function(peer_id, index, roomies_internal_ref) {
 				var new_peer = new PeerWrapper(peer_id);
 				attachEventsAndPush(new_peer);
 			});
 
-			global.room_scope = $scope;
 		});
 
 	}]);

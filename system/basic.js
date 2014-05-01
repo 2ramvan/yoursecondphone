@@ -17,7 +17,7 @@ basic.render = function(view_name, status_code) {
 basic.index = function(req, res){
 	res.locals.page_id = "main";
 	res.locals.skipIntro = false;
-	res.locals.show_ad = true;
+	res.locals.show_ad = false;
 
 	res.render("index", {
 		page_id: "main"

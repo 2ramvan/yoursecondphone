@@ -103,6 +103,18 @@ body {
 		}
 	}
 
+	&#about {
+		.color_red {
+			color: #c0392b;
+		}
+		.color_green {
+			color: @sec;
+		}
+		.color_yellow {
+			color: #f39c12;
+		}
+	}
+
 	h1,h2,h3,h4,h5,h6 {
 		font-family: 'Aldrich';
 		color: @dark_grey;
@@ -163,6 +175,21 @@ body {
 				h3 {
 					color: darken(@dark_grey, 10%) !important;
 				}
+
+				#room_link {
+					color: lighten(@dark_grey, 30%);
+
+					#instruct {
+						font-size: 1.3em;
+					}
+					#link {
+						.round_all;
+						display: table;
+						margin: .5em auto 0;
+						background-color: darken(@dark_grey, 10%);
+						padding: .5em;
+					}
+				}
 			}
 
 			#peer-containers{
@@ -213,6 +240,14 @@ body {
 					background-color: transparent;
 					h3 {
 						color: white !important;
+					}
+
+					div#room_link {
+						color: white;
+
+						#link {
+							background-color: transparent;
+						}
 					}
 				}
 

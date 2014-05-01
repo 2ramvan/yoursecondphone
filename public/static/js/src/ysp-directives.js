@@ -3,6 +3,23 @@
 	
 	angular.module("ysp-directives", [])
 
+	.directive("pinToBottom", ["$log", "$rootScope", "$timeout", function($log, $rootScope, $timeout) {
+		
+		return {
+			restrict: "C",
+			link: function(scope, element, attrs) {
+				element = element[0];
+				$rootScope.$on("ysp:message", function(event) {
+					$timeout(function() {
+						$(element).scrollTop(element.scrollHeight + 200);
+					}, 75);
+				});
+
+			}
+		}
+
+	}])
+
 	.directive("peer", ["$log", function($log) {
 		
 		return {
@@ -28,9 +45,6 @@
 	}])
 
 	.directive("mirror", ["$log", "GumService", function($log, GumService) {
-		
-		global.GumService = GumService;
-
 		return {
 			restrict: "E",
 			link: function(scope, element, attrs) {
