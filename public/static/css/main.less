@@ -14,68 +14,6 @@ html,body {
 	margin: 0px;
 }
 
-.round_all {
-	border-top-right-radius: @global_radius;
-	border-top-left-radius: @global_radius;
-	border-bottom-right-radius: @global_radius;
-	border-bottom-left-radius: @global_radius;
-}
-.round_left {
-	border-top-right-radius: 0px;
-	border-top-left-radius: @global_radius;
-	border-bottom-right-radius: 0px;
-	border-bottom-left-radius: @global_radius;
-}
-.round_right {
-	border-top-right-radius: @global_radius;
-	border-top-left-radius: 0px;
-	border-bottom-right-radius: @global_radius;
-	border-bottom-left-radius: 0px;
-}
-.round_top {
-	border-top-right-radius: @global_radius;
-	border-top-left-radius: @global_radius;
-	border-bottom-right-radius: 0px;
-	border-bottom-left-radius: 0px;
-}
-.round_bottom {
-	border-top-right-radius: 0px;
-	border-top-left-radius: 0px;
-	border-bottom-right-radius: @global_radius;
-	border-bottom-left-radius: @global_radius;
-}
-
-ul.button-group {
-	li {
-		a {
-			background-color: @prim;
-			border:none;
-			outline: none;
-			box-shadow: none;
-
-			&:hover {
-				background-color: lighten(@prim, 5%);
-			}
-		}
-
-		&:first-child {
-			a {
-				.round_left;
-			}
-		}
-		&:last-child {
-			a {
-				.round_right;
-			}
-		}
-		&:only-child {
-			a {
-				.round_all;
-			}
-		}
-	}
-}
-
 .cf:before, .cf:after { content: ""; display: table; }
 .cf:after { clear: both; }
 .cf { zoom: 1; }
@@ -89,12 +27,30 @@ ul.button-group {
 	user-select: none;
 }
 
+html {
+	&.js {
+		#main-setup {
+			#no-js {
+				display: none;
+			}
+		}
+	}
+
+	&.no-js {
+		#main-setup {
+			#setting-up {
+				display: none;
+			}
+		}
+	}
+}
+
 body {
-	font-size: 15px;
+	font-size: 16px;
 	color:@dark_grey;
 
-	div#page_content {
-		margin-top: 25px;
+	#page_content {
+		margin-top: 1em;
 	}
 
 	&#donate {
@@ -103,16 +59,26 @@ body {
 		}
 	}
 
+	.color_red {
+		color: #c0392b;
+	}
 	&#about {
-		.color_red {
-			color: #c0392b;
-		}
 		.color_green {
 			color: @sec;
 		}
 		.color_yellow {
 			color: #f39c12;
 		}
+	}
+
+	.vertical-center {
+		position: relative;
+		top: 50%;
+		-moz-transform: translateY(-50%);
+		-webkit-transform: translateY(-50%);
+		-o-transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
 	}
 
 	h1,h2,h3,h4,h5,h6 {
@@ -128,14 +94,12 @@ body {
 		background-color: @prim;
 		border-top: @sec 5px solid;
 		padding: 1em;
-		.round_bottom;
 	}
 	
 	footer#global_footer {
 		margin-bottom: 100px;
 		padding: 1em;
 		background-color: @grey;
-		.round_all;
 
 		ul.inline-list {
 			margin: 0 auto;
@@ -183,7 +147,6 @@ body {
 						font-size: 1.3em;
 					}
 					#link {
-						.round_all;
 						display: table;
 						margin: .5em auto 0;
 						background-color: darken(@dark_grey, 10%);
@@ -324,7 +287,6 @@ body {
 					}
 
 					.peer-message {
-						.round_all;
 						background-color: @grey;
 						border-left-color: @grey;
 						border-left: .5em solid;
@@ -384,6 +346,13 @@ body {
 			}
 		}
 
+		&.alt {
+			header {
+				background-color: @grey;
+				border-bottom-color: @dark_grey;
+			}
+		}
+
 
 		background:none;
 		border:none;
@@ -392,7 +361,6 @@ body {
 			background-color: @prim;
 			padding: 1em;
 			border-bottom: @sec solid 5px;
-			.round_top;
 			h1,h2,h3,h4,h5,h6 {
 				.no-margin;
 				color: white;
@@ -402,6 +370,7 @@ body {
 		div.panel_body {
 			background-color: @grey;
 			padding: 1em;
+			line-height: 1.6em;
 
 			h1,h2,h3,h4,h5,h6 {
 				color: @dark_grey !important;
@@ -412,29 +381,56 @@ body {
 			*:last-child {
 				margin-bottom: 0px;
 			}
-			.round_bottom;
 		}
-		margin-bottom: 2em;
+		margin-bottom: 1em;
 	}
 
-	button, .button {
+	.default_button {
 		background-color: @prim;
 		border: none;
 		box-shadow: none;
 		outline: none;
-		.round_all;
-		color: white;
+	}
+
+	button, .button {
+		-webkit-transition: all .15s linear;
+		-moz-transition: all .15s linear;
+		-ms-transition: all .15s linear;
+		-o-transition: all .15s linear;
+		transition: all .15s linear;
+	
+		.default_button;
 
 		&:hover {
 			background-color: lighten(@prim, 10%);
 		}
 
-		&:active, &:focus {
-			background-color: @sec;
+		&:active {
+			background-color: @sec !important;
 		}
 
-		&:disabled {
-			background-color: lighten(@prim, 10%)
+		&:disabled, &[disabled] {
+			background-color: @dark_grey;
+			color: @grey;
+
+			&:hover {
+				background-color: @dark_grey;
+				color: @grey;
+			}
+
+			&:active {
+				background-color: @dark_grey !important;
+				color: @grey;
+			}
+
+			&:focus {
+				background-color: @dark_grey;
+				color: @grey;
+			}
+		}
+
+		&:focus {
+			.default_button;
 		}
 	}
 

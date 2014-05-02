@@ -94,6 +94,10 @@ var signaler = PeerServer({
 
 negotiator.sockets.on("connection", function(socket) {
 
+	socket.on("room_exists", function(room_id, ack) {
+		return ack(room_cache.has(room_id));
+	});
+
 	socket.on("debug", function() {
 		console.log("-------------[ DEBUG ]-------------");
 		room_cache.forEach(function(room, room_id) {
@@ -139,14 +143,13 @@ negotiator.sockets.on("connection", function(socket) {
 
 				if(room_cache.has(room_id)){
 					var room = room_cache.get(room_id);
+					room.removePeer(peer_id);
 
 					if(room.isEmpty()){
 						room_cache.del(room_id);
 					}else{
 						room.broadcast(peer_id, "peer_left", peer_id);
 					}
-
-					room.removePeer(peer_id);
 				}
 			}
 		]);
@@ -224,7 +227,11 @@ negotiator.sockets.on("connection", function(socket) {
 			function(peer_id, callback) {
 				room_cache.forEach(function(room, room_id, room_cache) {
 					if(room.removePeer(peer_id)){
-						room.broadcast(peer_id, "peer_left", peer_id);
+						if(room.isEmpty()){
+							room_cache.del(room_id);
+						}else{
+							room.broadcast(peer_id, "peer_left", peer_id);
+						}
 					}
 				});
 

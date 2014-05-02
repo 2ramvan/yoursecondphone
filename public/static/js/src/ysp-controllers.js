@@ -1,7 +1,7 @@
 (function(global){
 	'use strict';
 	
-	angular.module("ysp-controllers", ["ngStorage", "ngSanitize", "Scope.safeApply"])
+	angular.module("ysp-controllers", ["ngSanitize", "Scope.safeApply"])
 
 /*
 
@@ -20,7 +20,8 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 			"no-webcam": "Your Second Phone was denied access to the webcam!",
 			"server-error": "Your Second Phone is unable to communicate with the server. Please try again in a few minutes.",
 			"browser-incompatible": "Your browser is not capable of making video calls, please use the latest version of <a target='_blank' href='https://www.google.com/chrome'>Google Chrome</a>, <a target='_blank' href='https://www.mozilla.org/firefox'>Firefox</a> or <a target='_blank' href='http://www.opera.com/'>Opera</a>",
-			"unavailable-id": "The conversation ID you were attempting to use is not available."
+			"ssl-unavailable": "An error was encountered while attempting to establish a secure connection with the server",
+			"socket-error": "An unexpected error occured while trying to negotiate a connection."
 		};
 
 		$scope.error_id = error_descriptions.hasOwnProperty($routeParams.err_type) ? $routeParams.err_type : "unknown-error";
@@ -40,9 +41,14 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 
  */
 
-	.controller("RootCtrl", ["$log", "$scope", "GumService", "chance", "$location", "$localStorage", function($log, $scope, GumService, chance, $location, $localStorage){
+	.controller("RootCtrl", ["$log", "$scope", "GumService", "chance", "$location", "supportsRealTimeCommunication", "negotiator", "$timeout", function($log, $scope, GumService, chance, $location, supportsRealTimeCommunication, negotiator, $timeout){
+		$scope.current_step = 0;
 
-		$scope.current_step = 1;
+		if(supportsRealTimeCommunication()){
+			$scope.current_step = 1;
+		}else{
+			$scope.current_step = -1;
+		}
 
 		$scope.room_name = "";
 		$scope.valid_room_name = true;
@@ -56,7 +62,10 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 			$scope.valid_room_name = newVal.match(/^\w(\w|-){1,30}$/);
 		});
 
+		$scope.loading_gum = false;
+
 		$scope.initGum = function() {
+			$scope.loading_gum = true;
 			GumService.once("active", function() {
 				$scope.current_step += 1;
 				$scope.$safeApply();
@@ -64,15 +73,29 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 			GumService.invoke();
 		};
 
+		$scope.loading_room = false;
+		$scope.error_message = "";
 		$scope.launchRoom = function() {
+			$scope.loading_room = true;
 			$log.debug("Launching room... %s", $scope.room_name);
 
 			if(!$scope.valid_room_name || $scope.room_name == ""){
 				$scope.room_name = chance.word({ length: 8 });
 			}
 
-			$location.path("/" + $scope.room_name); // Pass application over to Room
-			$scope.$safeApply();
+			negotiator.room_exists($scope.room_name, function(exists) {
+				$scope.loading_room = false;
+				if(exists){
+					$scope.error_message = "Sorry, that room name is already taken.";
+					$scope.$safeApply();
+					$timeout(function() {
+						$scope.error_message = "";
+					}, 5000);
+				}else{
+					$location.path("/" + $scope.room_name);
+					$scope.$safeApply();
+				}
+			});
 		};
 
 	}])
@@ -89,7 +112,11 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "$localStorage", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "chance", "$rootScope", function($log, $scope, GumService, $location, $routeParams, $localStorage, negotiator, ApplicationError, PeerWrapper, peer, fullscreen, chance, $rootScope){
+	.controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "negotiator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "chance", "$rootScope", "supportsRealTimeCommunication", function($log, $scope, GumService, $location, $routeParams, negotiator, ApplicationError, PeerWrapper, peer, fullscreen, chance, $rootScope, supportsRealTimeCommunication){
+
+		if(!supportsRealTimeCommunication()){
+			return new ApplicationError("browser-incompatible", true);
+		}
 
 		$scope.room_id = $routeParams.room_id;
 		$scope.room_link = "http://ysp.im/#/" + $routeParams.room_id;

@@ -1,7 +1,19 @@
 (function(global){
 	'use strict';
 	
-	angular.module("ysp-services", ["ngStorage"])
+	angular.module("ysp-services", [])
+
+	.service("supportsRealTimeCommunication", ["$log", function($log) {
+
+		return function() {
+			if(!global.util.supports.audioVideo || !global.util.supports.data){
+				return false;
+			}else{
+				return true;
+			}
+		}
+
+	}])
 
 /*
                                         
@@ -31,8 +43,21 @@ o888o
 		});
 
 		peer.on("error", function(err) {
-			$log.error("peer: Error! - ", err.type, err);
-			new ApplicationError(err.type);
+			$log.error("peer: %s", err.type, err);
+
+			var fatal_ref = {
+				"browser-incompatible": false, // we're letting other methods handle this
+				"invalid-id": false,
+				"invalid-key": false,
+				"unavailable-id": false,
+				"ssl-unavailable": true,
+				"server-disconnected": false,
+				"server-error": true,
+				"socket-error": true,
+				"socket-closed": true
+			};
+
+			return new ApplicationError(err.type, fatal_ref[err.type] || false);
 		});
 
 		peer.on("connection", function() {
@@ -58,8 +83,16 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
 
  */
 
-	.service("_socket", ["negotiator_host", "negotiator_port", function(negotiator_host, negotiator_port) {
-		return io.connect("https://" + negotiator_host + ":" + negotiator_port);
+	.service("_socket", ["negotiator_host", "negotiator_port", "ApplicationError", function(negotiator_host, negotiator_port, ApplicationError) {
+		var socket = io.connect("https://" + negotiator_host + ":" + negotiator_port);
+
+		socket.on("error", function() {
+			return new ApplicationError("socket-io-error", true);
+		});
+
+		global.skt = socket;
+
+		return socket;
 	}])
 
 /*
@@ -94,12 +127,16 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			});
 		});
 
+		function room_exists(room_id, cb) {
+			_socket.emit("room_exists", room_id, cb || angular.noop);
+		}
+
 		function advertise_peer_id(callback){
 			$log.debug("negotiator: advertising peer_id to negotiator...");
 
 			var cb = function(err) {
 				if(err)
-					return new ApplicationError(err);
+					return new ApplicationError(err, true);
 
 				$log.debug("negotiator: peer_id successfully advertised...")
 				is_ready_state = true;
@@ -138,6 +175,7 @@ o888o o888o `Y8bod8P' `8oooooo.  `Y8bod8P'   "888" o888o `Y888""8o   "888" `Y8bo
 			return is_ready_state;
 		}
 
+		exports.room_exists = room_exists;
 		exports.advertise_peer_id = advertise_peer_id;
 		exports.join_room = join_room;
 		exports.leave_room = leave_room;
@@ -413,7 +451,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 		var gum = new Gum();
 
 		gum.on("error", function() {
-			return new ApplicationError("no-webcam");
+			return new ApplicationError("no-webcam", true);
 		});
 
 		return gum;

@@ -1,12 +1,16 @@
 (function(global){
 	'use strict';
 	
-	angular.module("ysp", ["ysp-services", "ysp-controllers", "ysp-directives", "ngRoute", "ngSanitize", "ngStorage", "Scope.safeApply"])
+	angular.module("ysp", ["ysp-services", "ysp-controllers", "ysp-directives", "ngRoute", "ngSanitize", "Scope.safeApply"])
 
 	.constant("negotiator_host", "negotiate.ysp.im")
 	.constant("negotiator_port", 9091)
 	.constant("signaler_port", 9090)
 	.value("fullscreen", screenfull)
+
+	.config(["$logProvider", function($logProvider) {
+		$logProvider.debugEnabled(false);
+	}])
 
 	.config(["$routeProvider", function($routeProvider) {
 		
@@ -32,13 +36,6 @@
 	}])
 
 	.run(["$log", "peer", "negotiator", "ApplicationError", function($log, peer, negotiator, ApplicationError) {
-
-		if(!global.util.supports.audioVideo || !global.util.supports.data){
-			return new ApplicationError("browser-incompatible");
-		}else{
-			$log.debug("Browser supports all necessary components");
-		}
-
 		if(peer.open){
 			negotiator.advertise_peer_id();
 		}else{
@@ -50,16 +47,27 @@
 
 	.factory("ApplicationError", ["$log", "$location", "$rootScope", function($log, $location, $rootScope) {
 
-		function ApplicationError(type){
-			if(!this instanceof ApplicationError) return new ApplicationError(type);
+		function ApplicationError(type, panic){
+			if(!this instanceof ApplicationError) return new ApplicationError(type, panic);
 
-			Error.call(this, arguments);
+			if(!panic)
+				panic = false;
+
+			Error.apply(this, arguments);
 			this.name = "ApplicationError";
 			this.type = type;
 			this.message = type || "unknown-error";
 
+			(global.ga || angular.noop)("send", "exception", {
+				exDescription: this.message,
+				exFatal: panic
+			});
+
 			$log.error("ApplicationError - %s", type);
-			$location.url("/error/" + type);
+
+			if(panic){
+				$location.url("/error/" + type);
+			}
 			$rootScope.$safeApply();
 		}
 		ApplicationError.prototype = new Error();

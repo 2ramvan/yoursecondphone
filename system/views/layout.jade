@@ -1,5 +1,5 @@
 doctype 5
-html(lang="en")
+html(lang="en", class="no-js")
 	head
 		meta(charset="utf-8")
 		meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
@@ -16,7 +16,7 @@ html(lang="en")
 		meta(property="og:image:secure_url", content="https://yoursecondphone.co/static/img/ogp.png")
 
 		link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.0/normalize.min.css")
-		link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/foundation/4.3.2/css/foundation.min.css")
+		link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css")
 		link(rel="stylesheet", href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
 		link(rel="stylesheet", href="//fonts.googleapis.com/css?family=Aldrich")
 		link(rel="stylesheet", href="/static/css/animate.min.css")
@@ -44,6 +44,7 @@ html(lang="en")
 						script.
 							!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 		//- Load jQuery
+		script(src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js")
 		script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js")
 		script(src="//cdnjs.cloudflare.com/ajax/libs/sugar/1.3.9/sugar.min.js")
 
