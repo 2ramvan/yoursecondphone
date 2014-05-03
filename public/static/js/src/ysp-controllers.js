@@ -15,16 +15,25 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 
  */
 
-	.controller("ErrorCtrl", ["$log", "$scope", "$routeParams", function($log, $scope, $routeParams){
+	.controller("ErrorCtrl", ["$log", "$scope", "$routeParams", function($log, $scope, $routeParams, negotiator_port, signaler_port){
+
+		function neg(error) {
+			return "Your Second Phone is unable to communicate with the server. Make sure that your firewall isn't blocking access to ports " + signaler_port + " and " + negotiator_port + ". These are important to Your Second Phone working. Or the server could be down, if this error keeps happening even after you check your firewall, please report it to <a href=\"https://twitter.com/home?status=@yoursecondphone%20I'm%20getting%20a%20%22" + error + "%22.%20Please%20help!
+		\" target='_blank'>@yoursecondphone</a>";
+		}
+		var negotiator_error = "Your Second Phone is unable to communicate with the server. Make sure that your firewall isn't blocking access to ports 9090 and 9091. These are important to Your Second Phone working. Or the server could be down, if this error keeps happening even after you check your firewall, please report it to <a href=\"https://twitter.com/home?status=@yoursecondphone%20I'm%20getting%20a%20%22{0}%22.%20Please%20help!
+		\" target='_blank'>@yoursecondphone</a>";
+
 		var error_descriptions = {
 			"no-webcam": "Your Second Phone was denied access to the webcam!",
-			"server-error": "Your Second Phone is unable to communicate with the server. Please try again in a few minutes.",
+			"server-error": neg("server-error"),
 			"browser-incompatible": "Your browser is not capable of making video calls, please use the latest version of <a target='_blank' href='https://www.google.com/chrome'>Google Chrome</a>, <a target='_blank' href='https://www.mozilla.org/firefox'>Firefox</a> or <a target='_blank' href='http://www.opera.com/'>Opera</a>",
-			"ssl-unavailable": "An error was encountered while attempting to establish a secure connection with the server",
-			"socket-error": "An unexpected error occured while trying to negotiate a connection."
+			"ssl-unavailable": "An error was encountered while attempting to establish a secure connection with the server.",
+			"socket-error": neg("socket-error"),
+			"socket-io-error": neg("socket-io-error")
 		};
 
-		$scope.error_id = error_descriptions.hasOwnProperty($routeParams.err_type) ? $routeParams.err_type : "unknown-error";
+		$scope.error_id = $routeParams.err_type;
 		$scope.error_description = error_descriptions[$scope.error_id] || "An unknown error has occured.";
 
 	}])
