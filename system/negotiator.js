@@ -77,7 +77,9 @@ RoomAbstract.prototype.broadcast = function() {
 		cb(null, socket_cache.get(_peer_id));
 	}, function(err, sockets) {
 		async.each(sockets, function(socket, cb) {
-			socket.emit.apply(socket, args);
+			if(!!socket){
+				socket.emit.apply(socket, args);
+			}
 			cb(null);
 		})
 	})
