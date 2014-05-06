@@ -38,6 +38,8 @@ server.use(middleware.set_strict_transport_security());
 server.use(function(req, res, next) {
 	if(req.get("user-agent").match(/pingdom/i))
 		return res.send(200);
+
+	next();
 })
 
 // Let's save some bandwidth and load time
