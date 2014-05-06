@@ -34,6 +34,12 @@ server.use(middleware.redirect_to_secure());
 // http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
 server.use(middleware.set_strict_transport_security());
 
+// keep pingdom out of the logs
+server.use(function(req, res, next) {
+	if(req.get("user-agent").match(/pingdom/i))
+		return res.send(200);
+})
+
 // Let's save some bandwidth and load time
 server.use(express.compress());
 
