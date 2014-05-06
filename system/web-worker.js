@@ -2,7 +2,6 @@ process.title = "Your Second Phone - web-worker.js";
 
 // Libraries
 var express = require("express"),
-	fs = require("fs"),
 	spdy = require("spdy");
 
 var basic = require(__dirname + "/basic.js"),
@@ -50,8 +49,6 @@ server.use(express.static(__dirname + "/../public"));
 
 // Let's do some logging
 server.use(express.logger());	
-
-server.use(express.cookieParser());
 
 // Done with middleware - wire up routes
 server.get("/about", basic.render("about"));
