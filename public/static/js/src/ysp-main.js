@@ -1,79 +1,88 @@
-(function(global){
-	'use strict';
-	
-	angular.module("ysp", ["ysp-services", "ysp-controllers", "ysp-directives", "ngRoute", "ngSanitize", "Scope.safeApply"])
+(function(global) {
+  'use strict';
 
-	.constant("negotiator_host", "negotiate.ysp.im")
-	.constant("negotiator_port", 9091)
-	.constant("signaler_port", 9090)
-	.value("fullscreen", screenfull)
+  angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize', 'Scope.safeApply'])
 
-	.config(["$logProvider", function($logProvider) {
-		$logProvider.debugEnabled(false);
-	}])
+  .constant('main_host', 'yoursecondphone.co')
 
-	.config(["$routeProvider", function($routeProvider) {
-		
-		$routeProvider.when("/", {
-			controller: "RootCtrl",
-			templateUrl: "/static/views/root.html"
-		});
+  .constant('peer_server_port', 8080)
 
-		$routeProvider.when("/error/:err_type", {
-			controller: "ErrorCtrl",
-			templateUrl: "/static/views/error.html"
-		});
+  .value('fullscreen', screenfull)
 
-		$routeProvider.when("/:room_id", {
-			controller: "RoomCtrl",
-			templateUrl: "/static/views/room.html"
-		});
+  .config(['$logProvider',
+    function($logProvider) {
+      $logProvider.debugEnabled(false);
+    }
+  ])
 
-		$routeProvider.otherwise({
-			redirectTo: "/"
-		});
+  .config(['$routeProvider',
+    function($routeProvider) {
 
-	}])
+      $routeProvider.when('/', {
+        controller: 'RootCtrl',
+        templateUrl: '/static/views/root.html'
+      });
 
-	.run(["$log", "peer", "negotiator", "ApplicationError", function($log, peer, negotiator, ApplicationError) {
-		if(peer.open){
-			negotiator.advertise_peer_id();
-		}else{
-			peer.on("open", function(id) {
-				negotiator.advertise_peer_id();
-			});
-		}
-	}])
+      $routeProvider.when('/error/:err_type', {
+        controller: 'ErrorCtrl',
+        templateUrl: '/static/views/error.html'
+      });
 
-	.factory("ApplicationError", ["$log", "$location", "$rootScope", function($log, $location, $rootScope) {
+      $routeProvider.when('/:room_id', {
+        controller: 'RoomCtrl',
+        templateUrl: '/static/views/room.html'
+      });
 
-		function ApplicationError(type, panic){
-			if(!this instanceof ApplicationError) return new ApplicationError(type, panic);
+      $routeProvider.otherwise({
+        redirectTo: '/'
+      });
 
-			if(!panic)
-				panic = false;
+    }
+  ])
 
-			Error.apply(this, arguments);
-			this.name = "ApplicationError";
-			this.type = type;
-			this.message = type || "unknown-error";
+  .run(["$log", "peer", "coordinator", "ApplicationError",
+    function($log, peer, coordinator, ApplicationError) {
+      if (peer.open) {
+        coordinator.advertise_peer_id();
+      } else {
+        peer.once("open", function(id) {
+          coordinator.advertise_peer_id();
+        });
+      }
+    }
+  ])
 
-			(global.ga || angular.noop)("send", "exception", {
-				exDescription: this.message,
-				exFatal: panic
-			});
+  .factory("ApplicationError", ["$log", "$location", "$rootScope",
+    function($log, $location, $rootScope) {
 
-			$log.error("ApplicationError - %s", type);
+      function ApplicationError(type, panic) {
+        if (!this instanceof ApplicationError) return new ApplicationError(type, panic);
 
-			if(panic){
-				$location.url("/error/" + type);
-			}
-			$rootScope.$safeApply();
-		}
-		ApplicationError.prototype = new Error();
-		ApplicationError.prototype.constructor = ApplicationError;
+        if (!panic)
+          panic = false;
 
-		return ApplicationError;
-	}])
+        Error.apply(this, arguments);
+        this.name = "ApplicationError";
+        this.type = type;
+        this.message = type || "unknown-error";
+
+        (global.ga || angular.noop)("send", "exception", {
+          exDescription: this.message,
+          exFatal: panic
+        });
+
+        $log.error("ApplicationError - %s", type);
+
+        if (panic) {
+          $location.url("/error/" + type);
+        }
+        $rootScope.$safeApply();
+      }
+      ApplicationError.prototype = new Error();
+      ApplicationError.prototype.constructor = ApplicationError;
+
+      return ApplicationError;
+    }
+  ])
 
 })(this);
