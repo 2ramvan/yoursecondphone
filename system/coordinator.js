@@ -29,7 +29,7 @@ function RoomAbstract(room_id, first_peer) {
   this.peers = [];
 
   // TODO - have a room secret that makes someone an admin of the room
-  if ( !! first_peer) {
+  if (!!first_peer) {
     this.addPeer(first_peer);
   }
 }
@@ -75,7 +75,7 @@ RoomAbstract.prototype.broadcast = function() {
     cb(null, sockets.get(_peer_id));
   }, function(err, sockets) {
     async.each(sockets, function(socket, cb) {
-      if ( !! socket) {
+      if (!!socket) {
         socket.emit.apply(socket, args);
       }
       cb(null);
@@ -166,6 +166,8 @@ function register_coordinator(io) {
 
       if (!socket)
         return;
+
+      socket.removeAllListeners();
 
       if (!socket.hasOwnProperty('peer_id'))
         return;
