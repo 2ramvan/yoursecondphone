@@ -172,17 +172,22 @@ function register_coordinator(io) {
       if (!socket.hasOwnProperty('peer_id'))
         return;
 
+      debug('%s has disconnected', socket.peer_id);
+
       sockets.del(socket.peer_id);
 
+      var disc_peer_id = socket.peer_id;
+
       rooms.forEach(function(room, room_id, rooms) {
-        if (room.removePeer(socket.peer_id)) {
+        if (room.removePeer(disc_peer_id)) {
           if (room.isEmpty())
             rooms.del(room_id);
           else
-            room.broadcast(socket.peer_id, 'peer_left', socket.peer_id);
+            room.broadcast(disc_peer_id, 'peer_left', disc_peer_id);
         }
-      })
+      });
 
+      socket = null;
     });
 
   });
