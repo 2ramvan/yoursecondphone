@@ -44,11 +44,11 @@ app.use(middleware.set_strict_transport_security());
 
 // keep pingdom out of the logs
 app.use(function(req, res, next) {
-  if (req.get('user-agent').match(/pingdom/i))
+  if ((/pingdom/i).test(req.get('user-agent')))
     return res.send(200);
 
   next();
-})
+});
 
 // Let's save some bandwidth and load time
 app.use(compression());
