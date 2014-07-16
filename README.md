@@ -9,7 +9,6 @@ pull requests are welcome. if you're going to edit any vital code please run all
 $ git clone https://github.com/yoursecondphone/yoursecondphone
 $ npm install
 $ npm test
-
 ```
 
 #### other contributions
