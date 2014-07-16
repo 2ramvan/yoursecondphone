@@ -1,5 +1,5 @@
 'use strict';
-var _, async, fs, util, lru, rooms, debug, sockets;
+var _, async, fs, util, lru, rooms, debug, sockets, RoomAbstract;
 
 // 3rd party
 _ = require('lodash');
@@ -10,6 +10,8 @@ debug = require('debug')('coordinator');
 fs = require('fs');
 util = require('util');
 
+RoomAbstract = require('./RoomAbstract');
+
 lru = require('lru-cache');
 sockets = lru({
   maxAge: (1000 * 60 * 60 * 24)
@@ -17,71 +19,6 @@ sockets = lru({
 rooms = lru({
   maxAge: (1000 * 60 * 60 * 24)
 });
-
-function RoomAbstract(room_id, first_peer) {
-  if (!(this instanceof RoomAbstract)) return new RoomAbstract(room_id, first_peer);
-
-  if (!room_id.match(/^\w(\w|-){1,30}$/)) {
-    throw "invalid-room-id";
-  }
-
-  this.id = room_id;
-  this.peers = [];
-
-  // TODO - have a room secret that makes someone an admin of the room
-  if (!!first_peer) {
-    this.addPeer(first_peer);
-  }
-}
-RoomAbstract.prototype.addPeer = function(peer_id) {
-  if (this.peers.length < 3) {
-    if (this.peers.indexOf(peer_id) < 0) {
-      this.peers.push(peer_id);
-    }
-  } else {
-    throw "room-full";
-  }
-}
-RoomAbstract.prototype.removePeer = function(peer_id) {
-  var index = this.peers.indexOf(peer_id);
-  if (index >= 0) {
-    var tmp = _.clone(this.peers);
-    tmp.splice(index, 1);
-    this.peers = tmp;
-    return true;
-  } else {
-    return false;
-  }
-}
-RoomAbstract.prototype.getPeers = function(exclude) {
-  return this.peers.filter(function(peer_id) {
-    return peer_id != exclude;
-  });
-}
-RoomAbstract.prototype.getOtherPeers = RoomAbstract.prototype.getPeers;
-
-RoomAbstract.prototype.isEmpty = function() {
-  return !this.peers.length;
-}
-RoomAbstract.prototype.broadcast = function() {
-  var args = Array.prototype.slice.call(arguments);
-  var exclude = args.shift();
-
-  var audience = this.peers.filter(function(peer_id) {
-    return peer_id != exclude;
-  });
-
-  async.map(audience, function(_peer_id, cb) {
-    cb(null, sockets.get(_peer_id));
-  }, function(err, sockets) {
-    async.each(sockets, function(socket, cb) {
-      if (!!socket) {
-        socket.emit.apply(socket, args);
-      }
-      cb(null);
-    })
-  })
-}
 
 function register_coordinator(io) {
 
