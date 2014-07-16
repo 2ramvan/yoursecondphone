@@ -210,7 +210,7 @@ describe('coordinator', function() {
     };
   };
 
-  describe('room_exists', function(done) {
+  describe('room_exists', function() {
 
     var dummy_socket;
 

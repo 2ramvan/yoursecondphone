@@ -1,5 +1,3 @@
-var _ = require("lodash");
-
 var basic = {};
 
 basic.render = function(view_name, status_code) {
