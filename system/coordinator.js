@@ -6,10 +6,6 @@ _ = require('lodash');
 async = require('async');
 debug = require('debug')('coordinator');
 
-// Internal
-fs = require('fs');
-util = require('util');
-
 RoomAbstract = require('./RoomAbstract');
 
 lru = require('lru-cache');
