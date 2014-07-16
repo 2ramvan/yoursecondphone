@@ -19,6 +19,9 @@ basic.index = function(req, res) {
   res.locals.skipIntro = false;
   res.locals.show_ad = true;
 
+  if (req.ip == '127.0.0.1')
+    res.locals.show_ad = false;
+
   res.render("index", {
     page_id: "main"
   });
