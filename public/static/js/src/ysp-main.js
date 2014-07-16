@@ -83,6 +83,6 @@
 
       return ApplicationError;
     }
-  ])
+  ]);
 
 })(this);

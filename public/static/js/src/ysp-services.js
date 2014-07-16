@@ -104,7 +104,7 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
 
       socket.on('reconnect', function() {
         $log.debug('[_socket] - reconnected!');
-      })
+      });
 
       global.skt = socket;
 
@@ -131,11 +131,11 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
 
       _socket.on("peer_left", function(id) {
         exports.emit("peer_left", id);
-      })
+      });
 
       _socket.on("disconnect", function() {
         is_ready_state = false;
-      })
+      });
 
       _socket.on("reconnect", function() {
         advertise_peer_id(function() {
@@ -154,18 +154,18 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
           if (err)
             return new ApplicationError(err, true);
 
-          $log.debug("coordinator: peer_id successfully advertised...")
+          $log.debug("coordinator: peer_id successfully advertised...");
           is_ready_state = true;
           exports.emit("ready");
           (callback || angular.noop)();
-        }
+        };
 
         if (_socket.connected) {
           _socket.emit("peer_id", peer.id, cb);
         } else {
           _socket.once("connect", function() {
             _socket.emit("peer_id", peer.id, cb);
-          })
+          });
         }
       }
 
@@ -295,7 +295,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
               // if there is a callback_id create a callback function
               // that will acknowledge
-              if ( !! data.cb_id) {
+              if (!!data.cb_id) {
                 var cb = function() {
                   // all pretty self-explanatory
                   var msg = {
@@ -307,7 +307,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
                   msg.args = args;
 
                   self.dc.send(msg);
-                }
+                };
               }
 
               var args = data.args || [];
@@ -391,7 +391,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
           // call the sender
           senders[send_type].apply(self, args);
         }
-      }
+      };
 
       PeerWrapper.prototype.close = _.once(function() {
         var self = this;
@@ -437,7 +437,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
       var isInvoked = false;
 
       function Gum() {}
-      Gum.prototype = _.clone(EventEmitter.prototype)
+      Gum.prototype = _.clone(EventEmitter.prototype);
 
       Gum.prototype.invoke = function gum_invoke() {
         var self = this;
@@ -445,7 +445,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         if (!_.isFunction(getUserMedia))
           return new ApplicationError("browser-incompatible");
 
-        if ( !! ms && isInvoked)
+        if (!!ms && isInvoked)
           throw new Error("Gum already invoked!");
 
         getUserMedia({
@@ -458,26 +458,26 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         }, function(err) {
           isInvoked = false;
           self.emit("error", err);
-        })
-      }
+        });
+      };
 
       Gum.prototype.revoke = function gum_revoke() {
-        if ( !! ms) {
+        if (!!ms) {
           ms.stop();
         }
 
         isInvoked = false;
         self.emit("inactive");
-      }
+      };
 
       Gum.prototype.getMediaStream = function() {
         return ms;
-      }
+      };
 
       Gum.prototype.isInvoked = function(callback) {
         (callback || angular.noop).call(this, null, isInvoked);
         return isInvoked;
-      }
+      };
 
       var gum = new Gum();
 
@@ -494,6 +494,6 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
     function() {
       return new Chance();
     }
-  ])
+  ]);
 
 })(this);
