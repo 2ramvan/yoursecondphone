@@ -215,8 +215,8 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
                                                                                                                                
  */
 
-  .factory("PeerWrapper", ["$log", "peer", "GumService", "chance", "$interval", "$timeout",
-    function($log, peer, GumService, chance, $interval, $timeout) {
+  .factory("PeerWrapper", ["$log", "peer", "GumService", "$random", "$interval", "$timeout",
+    function($log, peer, GumService, $random, $interval, $timeout) {
 
       var senders = {
         "event": function() {
@@ -233,10 +233,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
             var callback = args.pop();
 
             // give it an id
-            var cb_id = chance.string({
-              length: 20,
-              pool: "abcdefghijklmnopqrstuvwxyz"
-            });
+            var cb_id = $random.string(20);
 
             // store it for later
             this.waiting_cbs[cb_id] = callback; // this refers to the peerwrapper just to avoid confusion
@@ -489,10 +486,29 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
     }
   ])
 
-  .service("chance", [
+  .service('$random', ['$log',
+    function($log) {
 
-    function() {
-      return new Chance();
+      function rand_string(length) {
+        length = length || 15;
+        var out = [];
+        var possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+        for (var i = 0; i < length; i++)
+          out.push(possible.charAt(Math.round(Math.random() * possible.length)));
+
+        return out.join('');
+      }
+
+      function rand_int(max, min) {
+        max = max || 1;
+        min = min || 0;
+
+        return Math.round(Math.random() * (max - min) + min);
+      }
+
+      this.string = rand_string;
+      this.integer = rand_int;
     }
   ]);
 

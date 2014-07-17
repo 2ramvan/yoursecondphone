@@ -49,8 +49,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 
  */
 
-  .controller('RootCtrl', ['$log', '$scope', 'GumService', 'chance', '$location', 'supportsRealTimeCommunication', 'coordinator', '$timeout',
-    function($log, $scope, GumService, chance, $location, supportsRealTimeCommunication, coordinator, $timeout) {
+  .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'supportsRealTimeCommunication', 'coordinator', '$timeout',
+    function($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, $timeout) {
       $scope.current_step = 0;
 
       if (supportsRealTimeCommunication()) {
@@ -88,11 +88,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
         $scope.loading_room = true;
         $log.debug('Launching room... %s', $scope.room_name);
 
-        if (!$scope.valid_room_name || $scope.room_name == '') {
-          $scope.room_name = chance.word({
-            length: 8
-          });
-        }
+        if (!$scope.valid_room_name || $scope.room_name == '')
+          $scope.room_name = $random.string(10);
 
         coordinator.room_exists($scope.room_name, function(exists) {
           $scope.loading_room = false;
@@ -124,8 +121,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-  .controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "chance", "$rootScope", "supportsRealTimeCommunication",
-    function($log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, chance, $rootScope, supportsRealTimeCommunication) {
+  .controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
+    function($log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
 
       if (!supportsRealTimeCommunication()) {
         return new ApplicationError("browser-incompatible", true);
@@ -159,8 +156,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       };
 
       $scope.sendMessage = function() {
-        if ( !! $scope.draft) {
-          if ( !! $scope.peers.length) {
+        if (!!$scope.draft) {
+          if (!!$scope.peers.length) {
             async.each($scope.peers, function(peer, cb) {
               peer.send("message", $scope.draft);
               cb(null);
@@ -283,7 +280,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
           // pick a color for the peer
           do {
-            peerWrapper.color_code = chance.pick(colors);
+            peerWrapper.color_code = colors[$random.integer(4)];
           } while (_.contains(taken_colors, peerWrapper.color_code));
 
           taken_colors.push(peerWrapper.color_code);
