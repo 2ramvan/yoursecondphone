@@ -13,10 +13,10 @@ sio = require('socket.io');
 http = require('http');
 
 // internal dependencies
-basic = require(__dirname + '/basic.js');
-middleware = require(__dirname + '/middleware.js');
-config = require(__dirname + '/../ysp_config.js');
-coordinator = require(__dirname + '/coordinator.js');
+basic = require('./basic');
+middleware = require('./middleware');
+config = require('../ysp_config');
+coordinator = require('./coordinator');
 
 app = express();
 
@@ -57,7 +57,7 @@ app.use(compression());
 app.use(express.static(__dirname + '/../public'));
 
 // Let's do some logging
-app.use(logger('short'));
+app.use(logger());
 
 // Done with middleware - wire up routes
 app.get('/about', basic.render('about'));
