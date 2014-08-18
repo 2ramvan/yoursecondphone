@@ -1,7 +1,7 @@
 (function(global) {
   'use strict';
 
-  angular.module("ysp-controllers", ["ngSanitize", "Scope.safeApply"])
+  angular.module("ysp-controllers", ["ngSanitize"])
 
   /*
 

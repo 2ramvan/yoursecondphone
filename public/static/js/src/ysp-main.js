@@ -1,7 +1,7 @@
 (function(global) {
   'use strict';
 
-  angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize', 'Scope.safeApply'])
+  angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize'])
 
   .constant('main_host', 'yoursecondphone.co')
 
