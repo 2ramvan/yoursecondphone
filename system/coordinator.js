@@ -35,12 +35,7 @@ function register_coordinator(io) {
 
       // if there is already a peer with this id, check if connected
       if (sockets.has(peer_id)) {
-        var a = sockets.get(peer_id);
-        if (a.connected) {
-          return ack('invalid-peer-id');
-        } else
-          sockets.del(peer_id);
-        // if not connected just continue and replace
+        sockets.del(peer_id);
       }
 
       socket.peer_id = peer_id;
