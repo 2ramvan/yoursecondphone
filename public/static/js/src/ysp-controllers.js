@@ -77,7 +77,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
         $scope.loading_gum = true;
         GumService.once('active', function() {
           $scope.current_step += 1;
-          $scope.$safeApply();
+          $timeout(angular.noop);
         });
         GumService.invoke();
       };
@@ -95,13 +95,13 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
           $scope.loading_room = false;
           if (exists) {
             $scope.error_message = 'Sorry, that room name is already taken.';
-            $scope.$safeApply();
+            $timeout(angular.noop);
             $timeout(function() {
               $scope.error_message = '';
             }, 5000);
           } else {
             $location.path('/' + $scope.room_name);
-            $scope.$safeApply();
+            $timeout(angular.noop);
           }
         });
       };
@@ -121,8 +121,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-  .controller("RoomCtrl", ["$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
-    function($log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
+  .controller("RoomCtrl", ["$timeout", "$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
+    function($timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
 
       if (!supportsRealTimeCommunication()) {
         return new ApplicationError("browser-incompatible", true);
@@ -152,7 +152,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       // goFullscreen if you need help determining what this does, study code a bit more
       $scope.goFullscreen = function() {
         fullscreen.request(document.querySelector("div#all-streams"));
-        $scope.$safeApply();
+        $timeout(angular.noop);
       };
 
       $scope.sendMessage = function() {
@@ -187,7 +187,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
       // apply the scope when fullscreen state changes
       $(document).on(fullscreen.raw.fullscreenchange, function() {
-        $scope.$safeApply();
+        $timeout(angular.noop);
       });
 
       // here is where we tear down
@@ -202,6 +202,12 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         return fullscreen.isFullscreen;
       }, function(newVal) {
         $scope.isFullscreen = newVal;
+      });
+
+      $scope.$on('peer:reconnect', function() {
+        coordinator.once('ready', function() {
+          coordinator.join_room($scope.room_id);
+        });
       });
 
       // preflight check
@@ -298,7 +304,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
             $scope.peers = $scope.peers.filter(function(peer) {
               return peer.id != id;
             });
-            $scope.$safeApply();
+            $timeout(angular.noop);
           });
 
           peerWrapper.on("message", function(message) {
@@ -312,27 +318,33 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
             pushMessageToScope(msg);
             $scope.showMessages = true;
-            $scope.$safeApply();
+            $timeout(angular.noop);
           });
 
           $scope.peers.push(peerWrapper);
-          $scope.$safeApply();
+          $timeout(angular.noop);
         }
 
         // this is the primary way of knowing when someone has left
         coordinator.on("peer_left", function(id) {
+          $log.debug('[RoomCtrl] - coordinator said that (%s) left', id);
 
-          $scope.peers.forEach(function(peer, index, all_peers) {
-            if (peer.id == id) {
-              peer.close();
-              all_peers.splice(index, 1);
-            }
-          });
+          var peerw = _.find($scope.peers, { id: id });
 
-        });
+          if (peerw) {
+            peerw.close();
 
-        coordinator.on("reconnect", function() {
-          coordinator.join_room($scope.room_id);
+            var idx = taken_colors.indexOf(peerw.color_code);
+            if (idx >= 0) taken_colors.splice(idx, 1);
+
+            $scope.peers = $scope.peers.filter(function(peer) {
+              return peer.id != id;
+            });
+
+            $log.debug('[RoomCtrl] - successfully removed %s', id);
+          }
+
+          $timeout(angular.noop);
         });
 
         // process peers given by the coordinator

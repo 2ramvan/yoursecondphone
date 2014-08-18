@@ -12,6 +12,7 @@
     "connect-timeout": "1.x",
     "debug": "1.x",
     "express": "4.x",
+    "helmet": "0.4.x",
     "jade": "1.x",
     "lodash": "2.x",
     "lru-cache": "2.x",
@@ -27,7 +28,8 @@
     "mocha": "^1.20.1"
   },
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "mocha --reporter spec",
+    "start": "node system/main.js"
   },
   "repository": {
     "type": "git",

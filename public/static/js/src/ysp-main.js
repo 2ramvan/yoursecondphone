@@ -76,9 +76,9 @@
         if (panic) {
           $location.url("/error/" + type);
         }
-        $rootScope.$safeApply();
+        $timeout(angular.noop);
       }
-      ApplicationError.prototype = new Error();
+      ApplicationError.prototype = Error.prototype;
       ApplicationError.prototype.constructor = ApplicationError;
 
       return ApplicationError;

@@ -320,25 +320,6 @@ describe('coordinator', function() {
 
     });
 
-    it('should accept if given a peer_id that is already stored, but not connected', function(done) {
-
-      dummy_socket.emit('peer_id', 'peer1', function(err) {
-        assert.ok(!err, 'got an unexpected error');
-        done();
-      });
-
-    });
-
-    it('should reject if given a peer_id that is already stored, and still connected', function(done) {
-
-      dummy_socket.emit('peer_id', 'peer2', function(err) {
-        assert.ok(!!err, 'did not get that error');
-        assert.equal(err, 'invalid-peer-id', 'got an unexpected error code');
-        done();
-      });
-
-    });
-
   });
 
   describe('join_room', function() {
