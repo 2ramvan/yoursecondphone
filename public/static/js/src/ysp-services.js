@@ -178,9 +178,21 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
       });
 
       _socket.on("reconnect", function() {
-        advertise_peer_id(function() {
-          exports.emit("reconnect");
-        });
+        var back_online = function() {
+          $log.debug('coordinator: everything back online');
+          is_ready_state = true;
+        }
+
+        // if peer is still disconnected, wait for reconnect
+        if (peer.disconnected) {
+          var dereg = $rootScope.$on('peer:reconnect', function() {
+            dereg();
+            advertise_peer_id(back_online);
+          });
+        } else {
+          // otherwise, just re-advertise;
+          advertise_peer_id(back_online);
+        }
       });
 
       function room_exists(room_id, cb) {
