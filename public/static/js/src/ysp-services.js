@@ -146,8 +146,6 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
         $log.debug('[_socket] - reconnected!');
       });
 
-      global.skt = socket;
-
       return socket;
     }
   ])
@@ -164,8 +162,8 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
 
 */
 
-  .factory("coordinator", ["$log", "_socket", "ApplicationError", "peer",
-    function($log, _socket, ApplicationError, peer) {
+  .factory("coordinator", ["$log", "_socket", "ApplicationError", "peer", "$rootScope",
+    function($log, _socket, ApplicationError, peer, $rootScope) {
       var is_ready_state = false;
       var exports = new EventEmitter();
 
