@@ -29,8 +29,11 @@ o888o
                                         
  */
 
-  .service("peer", ["$log", "main_host", "peer_server_port", "ApplicationError",
-    function($log, main_host, peer_server_port, ApplicationError) {
+  .service("peer", ["$log", "main_host", "peer_server_port", "ApplicationError", "$timeout", "$interval", "$rootScope",
+    function($log, main_host, peer_server_port, ApplicationError, $timeout, $interval, $rootScope) {
+      var is_reconnect = false;
+      var attempting_to_reconnect = false;
+
       var peer = new Peer({
         host: main_host,
         port: peer_server_port,
@@ -40,6 +43,11 @@ o888o
 
       peer.on("open", function(id) {
         $log.debug("peer: main peer connection open (%s)", id);
+
+        if (!is_reconnect)
+          is_reconnect = true;
+        else
+          $rootScope.$broadcast('peer:reconnect');
       });
 
       peer.on("close", function() {
@@ -47,6 +55,38 @@ o888o
       });
 
       peer.on("error", function(err) {
+        if (err.type == 'network') {
+          // prevent redundant reconnect operations
+          if (attempting_to_reconnect) return;
+          else attempting_to_reconnect = true;
+
+          $log.debug('peer: lost connection to signaling server');
+
+          var attempt = 0;
+
+          var itvl = $interval(function() {
+            if (attempt >= 20) {
+              $log.debug('peer: giving up on reconnecting');
+              $interval.cancel(itvl);
+              return;
+            }
+
+            attempt++;
+            $log.debug('peer: attempting to reconnect (attempt: %d)', attempt);
+            peer.reconnect();
+          }, 1000);
+
+          peer.once("open", function() {
+            attempting_to_reconnect = false;
+
+            $interval.cancel(itvl);
+            $log.debug('peer: reconnected!!');
+          });
+
+          // dont freak out
+          return;
+        }
+
         $log.error("peer: %s", err.type, err);
 
         var fatal_ref = {
