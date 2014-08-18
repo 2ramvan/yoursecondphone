@@ -62,7 +62,7 @@ app.use(compression());
 app.use(express.static(__dirname + '/../public'));
 
 // Let's do some logging
-app.use(logger('dev'));
+app.use(logger('common'));
 
 // Done with middleware - wire up routes
 app.get('/about', basic.render('about'));
