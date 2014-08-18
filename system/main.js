@@ -1,5 +1,5 @@
 process.title = 'your second phone';
-var express, compression, timeout, logger, spdy, http, basic, middleware, config, sio, io, server, app;
+var express, compression, timeout, logger, spdy, http, basic, middleware, config, sio, io, server, app, helmet;
 
 // third-party dependencies
 express = require('express');
@@ -8,6 +8,7 @@ timeout = require('connect-timeout');
 logger = require('morgan');
 spdy = require('spdy');
 sio = require('socket.io');
+helmet = require('helmet');
 
 // node.js dependencies
 http = require('http');
@@ -19,6 +20,14 @@ config = require('../ysp_config');
 coordinator = require('./coordinator');
 
 app = express();
+
+app.use(helmet.xframe('deny'));
+app.use(helmet.hsts({
+  // one year
+  maxAge: (1000 * 60 * 60 * 24 * 7 * 4.345 * 12),
+  includeSubdomains: true
+}));
+app.use(helmet.hidePoweredBy());
 
 app.locals = {
   show_ad: false,
@@ -37,10 +46,6 @@ app.use(timeout());
 
 // Never allow unsecured HTTP requests on anything, always redirect to HTTPS
 app.use(middleware.redirect_to_secure());
-
-// Enable Strict Transport Security; max age possible.
-// http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
-app.use(middleware.set_strict_transport_security());
 
 // keep pingdom out of the logs
 app.use(function(req, res, next) {
@@ -81,6 +86,6 @@ http.Server(app).listen(80);
   port: 8080,
   ssl: config.ssl,
   path: '/peers',
-  origins: 'yoursecondphone.co:443'
+  origins: 'https://yoursecondphone.co'
 });
 server.listen(443);

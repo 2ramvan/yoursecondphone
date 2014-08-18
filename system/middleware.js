@@ -13,12 +13,3 @@ exports.redirect_to_secure = function(){
 		}
 	}
 };
-
-exports.set_strict_transport_security = function(){
-	return function(req, res, next){
-		// Enable Strict Transport Security; max age possible.
-		// http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
-		res.set("Strict-Transport-Security", "max-age=31536000");
-		next();
-	}
-};
