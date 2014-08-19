@@ -134,7 +134,8 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
         path: '/coordinator'
       });
 
-      socket.on("error", function() {
+      socket.on("error", function(err) {
+        console.error('socket-io-error', err);
         return new ApplicationError("socket-io-error", true);
       });
 
@@ -162,9 +163,11 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
 
 */
 
-  .factory("coordinator", ["$log", "_socket", "ApplicationError", "peer", "$rootScope",
-    function($log, _socket, ApplicationError, peer, $rootScope) {
+  .factory("coordinator", ["$log", "_socket", "ApplicationError", "peer", "$rootScope", "$q", '$timeout',
+    function($log, _socket, ApplicationError, peer, $rootScope, $q, $timeout) {
       var is_ready_state = false;
+      var current_room = null;
+
       var exports = new EventEmitter();
 
       _socket.on("peer_left", function(id) {
@@ -219,19 +222,27 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
         }
       }
 
-      function join_room(room_id, cb) {
-        if (is_ready_state) {
-          _socket.emit("join_room", room_id, function(err, roomies) {
-            exports.emit("join");
-            $log.debug("coordinator: joined room (%s)", room_id);
-            (cb || angular.noop).call(this, err, roomies);
-          });
-        } else {
-          throw new Error("Must publish peer_id before joining room");
-        }
+      function join_room(room_id) {
+        return $q(function(resolve, reject) {
+          if (is_ready_state) {
+
+            _socket.emit('join_room', room_id, function(err, roomies) {
+              if (err) return reject(err);
+              $log.debug('coordinator: joined room (%s)', room_id);
+
+              current_room = room_id;
+
+              resolve(roomies);
+            });
+
+          } else {
+            reject('no-peer-id');
+          }
+        });
       }
 
       function leave_room(room_id) {
+        current_room = null;
         if (is_ready_state) {
           _socket.emit("leave_room", room_id);
         }
@@ -241,11 +252,28 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
         return is_ready_state;
       }
 
+      function promiseUntilReady() {
+        return $q(function(resolve, reject) {
+          if (is_ready_state)
+            resolve();
+          else {
+            exports.once('ready', resolve);
+          }
+
+          $timeout(function() {
+            exports.removeListeners('ready', resolve);
+            reject('timed-out');
+          }, 5000);
+
+        });
+      }
+
       exports.room_exists = room_exists;
       exports.advertise_peer_id = advertise_peer_id;
       exports.join_room = join_room;
       exports.leave_room = leave_room;
       exports.isReady = isReady;
+      exports.promiseUntilReady = promiseUntilReady;
 
       return exports;
     }
@@ -478,61 +506,54 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
  */
 
-  .service("GumService", ["$log", "$rootScope", "ApplicationError",
-    function($log, $rootScope, ApplicationError) {
+  .service("GumService", ["$log", "$rootScope", "ApplicationError", "$q",
+    function($log, $rootScope, ApplicationError, $q) {
       var ms = null;
       var isInvoked = false;
 
-      function Gum() {}
-      Gum.prototype = _.clone(EventEmitter.prototype);
-
-      Gum.prototype.invoke = function gum_invoke() {
+      this.invoke = function gum_invoke() {
         var self = this;
 
         if (!_.isFunction(getUserMedia))
-          return new ApplicationError("browser-incompatible");
+          return $q.reject('browser-incompatible');
 
-        if (!!ms && isInvoked)
-          throw new Error("Gum already invoked!");
+        return $q(function(resolve, reject) {
+          if (!!ms && isInvoked)
+            return resolve(ms);
 
-        getUserMedia({
-          video: true,
-          audio: true
-        }, function(stream) {
-          ms = stream;
-          isInvoked = true;
-          self.emit("active", ms);
-        }, function(err) {
-          isInvoked = false;
-          self.emit("error", err);
+          getUserMedia({
+            video: true,
+            audio: true
+          }, function(stream) {
+            $rootScope.$broadcast('gum:invoke', stream);
+
+            ms = stream;
+            isInvoked = true;
+            resolve(ms);
+          }, function() {
+            $rootScope.$broadcast('gum:error', 'no-webcam');
+
+            // the error from this isn't very descriptive
+            // but since we ran quite a few tests to see if gUM is available
+            // chances are that webcam access was denied, so...
+            reject('no-webcam');
+          });
         });
-      };
+      }
 
-      Gum.prototype.revoke = function gum_revoke() {
-        if (!!ms) {
+      this.revoke = function gum_revoke() {
+        if (!!ms)
           ms.stop();
-        }
 
+        ms = null;
         isInvoked = false;
-        self.emit("inactive");
-      };
 
-      Gum.prototype.getMediaStream = function() {
+        $rootScope.$broadcast('gum:revoke');
+      }
+
+      this.getMediaStream = function gum_retrieve() {
         return ms;
-      };
-
-      Gum.prototype.isInvoked = function(callback) {
-        (callback || angular.noop).call(this, null, isInvoked);
-        return isInvoked;
-      };
-
-      var gum = new Gum();
-
-      gum.on("error", function() {
-        return new ApplicationError("no-webcam", true);
-      });
-
-      return gum;
+      }
     }
   ])
 
