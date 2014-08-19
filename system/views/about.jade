@@ -2,28 +2,27 @@ extends layout
 
 block main
 	.row
-		.large-6.columns
-			.panel#history
-				header: h3: <i class="fa fa-road"></i>&nbsp;History
-				.panel_body
-					p.
-						<b>Your Second Phone</b> started as a little experminent back in 2010. It originally existed as a means to call phones right from the browser, but has since evolved into a multi-tool of ad hoc communications.
-					p.
-						With the advent of <a href="http://www.webrtc.org" target="_blank">WebRTC</a>, <b>Your Second Phone</b> has become a turnkey video chat client, where anybody can simply start a video-chat without having an account, handing over personal infomation, or installing anything. <b>Your Second Phone</b> has never and <i>will never</i> require an account to use.
-		.large-6.columns
-			.panel#team
-				header: h3: <i class="fa fa-male"></i>&nbsp;Meet the Team
-				.panel_body
-					p.
-						<b>Your Second Phone</b> has been maintained and coded by me, <a href="http://nick.comer.io" target="_blank">Nick Comer</a>, for its entire existence. I like knowing that I can provide a very hassle-free means of letting people communicate with others.
+		.col-md-6
+			.panel.panel-primary#history
+				.panel-heading
+					h3.panel-title: <i class="fa fa-road"></i>&nbsp;History
+				.panel-body
+					p <b>Your Second Phone</b> started as a little experminent back in 2010. It originally existed as a means to call phones right from the browser, but has since evolved into a multi-tool of ad hoc communications.
+					p With the advent of <a href="http://www.webrtc.org" target="_blank">WebRTC</a>, <b>Your Second Phone</b> has become a turnkey video chat client, where anybody can simply start a video-chat without having an account, handing over personal infomation, or installing anything. <b>Your Second Phone</b> has never and <i>will never</i> require an account to use.
+		.col-md-6
+			.panel.panel-primary#team
+				.panel-heading
+					h3.panel-title: <i class="fa fa-male"></i>&nbsp;Meet the Team
+				.panel-body
+					p <b>Your Second Phone</b> has been maintained and coded by me, <a href="http://nick.comer.io" target="_blank">Nick Comer</a>, for its entire existence. I like knowing that I can provide a very hassle-free means of letting people communicate with others.
 	.row
-		.large-12.columns
-			.panel#advantage
-				header: h3: <i class="fa fa-thumbs-up"></i>&nbsp;Advantages
-				.panel_body
-					p.
-						Asking yourself why <b>Your Second Phone</b> is better than other video chat services? Let the table below tell you!
-					table#advantages_table
+		.col-md-12
+			.panel.panel-primary
+				.panel-heading
+					h3.panel-title: <i class="fa fa-thumbs-up"></i>&nbsp;Advantages
+				.panel-body
+					p Asking yourself why <b>Your Second Phone</b> is better than other video chat services? Let the table below tell you!
+					table#advantages_table.table
 						thead
 							tr
 								th
@@ -34,36 +33,34 @@ block main
 						tbody
 							tr
 								td.service_label Skype
-								td.color_red Yes
-								td.color_red Yes
-								td.color_red No
-								td.color_red No
+								td.text-danger Yes
+								td.text-danger Yes
+								td.text-danger No
+								td.text-danger No
 							tr
 								td.service_label Google+ Hangouts
-								td.color_red Yes
-								td.color_red Yes
-								td.color_red No
-								td.color_yellow Unknown
+								td.text-danger Yes
+								td.text-danger Yes
+								td.text-danger No
+								td.text-warning Unknown
 							tr
 								td.service_label Facebook
-								td.color_red Yes
-								td.color_red Yes
-								td.color_red No
-								td.color_red No
+								td.text-danger Yes
+								td.text-danger Yes
+								td.text-danger No
+								td.text-danger No
 							tr
 								td.service_label Your Second Phone
-								td.color_green No
-								td.color_green No
-								td.color_green Yes
-								td.color_green Yes
+								td.text-success No
+								td.text-success No
+								td.text-success Yes
+								td.text-success Yes					
 	.row
-		.large-12.columns
-			.panel
-				header: h3: <i class="fa fa-code-fork"></i>&nbsp;Contributing
-				.panel_body
-					p
-						<b>Your Second Phone</b> is open source. The code that runs everything is freely available to sift through. Contributions to the code and pull-requests are welcomed.
-					p.
-						If you find and issue but don't know much code, thats okay, just open an issue on GitHub and it will be addressed.
-					p
-						<a href="https://github.com/yoursecondphone" target="_blank">Your Second Phone's GitHub</a>
+		.col-md-12
+			.panel.panel-primary
+				.panel-heading
+					h3.panel-title: <i class="fa fa-code-fork"></i>&nbsp;Contributing
+				.panel-body
+					p <b>Your Second Phone</b> is open source. The code that runs everything is freely available to sift through. Contributions to the code and pull-requests are welcomed.
+					p If you find and issue but don't know much code, thats okay, just open an issue on GitHub and it will be addressed.
+					p <a href="/source" target="_blank">Your Second Phone's GitHub</a>

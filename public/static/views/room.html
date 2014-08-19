@@ -1,68 +1,92 @@
 <div id="root-view">
-	<div id="config-container">
-		<div id="config"></div>
-	</div>
-	<div class="panel">
-		<header>
-			<div class="row">
-				<div class="large-6 columns">
-					<h4><i class="fa fa-video-camera"></i>&nbsp;ID:&nbsp;{{ room_id }}</h4>
+	<div class="row">
+		<div class="col-md-12">
+			
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="fa fa-video-camera"></i>&nbsp;ID:&nbsp;{{ room_id }}</h3>
 				</div>
-				<div class="large-6 columns">
-					<ul class="button-group no-margin right">
-						<li><button class="tiny no-margin" ng-click="goFullscreen()" title="Go Fullscreen!"><i class="fa fa-arrows-alt"></i></button></li>
-					</ul>
-				</div>
-			</div>
-		</header>
-		<div class="panel_body">
-			<div id="all-streams" ng-class="{ fullscreen: isFullscreen }">
-				<div id="mirror-container">
-					<mirror></mirror>
-				</div>
-				<div id="waiting-for-peers" ng-hide="!!peers.length">
-					<h3><i class="fa fa-coffee"></i>&nbsp;Waiting for people to join...</h3>
-					<div id="room_link">
-						<div class="text-center" id="instruct"><i class="fa fa-share"></i>&nbsp;Invite people to join:</div>
-						<div class="text-center" id="link">{{ room_link }}</div>
-					</div>
-				</div>
-				<div id="peer-containers" ng-class="getNumPeers()" class="row" ng-hide="!peers.length">
-					<div class="peer-container columns" ng-repeat="peer in peers" ng-class="getColumnSize()">
-						<peer info="peer"></peer>
-					</div>
-				</div>
-			</div>
-			<div id="all-messages" ng-init="showMessages = true;">
-				<div id="all-messages-header" class="row">
-					<div class="large-6 columns">
-						<h4><i class="fa fa-comments-o"></i>&nbsp;Messages</h4>
-					</div>
-					<div class="large-6 columns" style="text-align:right;">
-						<h4 ng-click="showMessages = !showMessages"><i class="fa fa-caret-down clickable" ng-show="showMessages">&nbsp;</i><i class="fa fa-caret-left clickable" ng-show="!showMessages"></i></h4>
-					</div>
-				</div>
-				<div id="messages-window" ng-show="showMessages" class="pin-to-bottom">
-					<div class="peer-message-container" ng-repeat="msg in messages">
-						<div class="peer-message" ng-class="msg.color_code">
+				<div class="panel-body">
+
+					<div id="all-streams" ng-class="{ fullscreen: isFullscreen, zero: ($scope.peers.length == 0), one: ($scope.peers.length == 1), two: ($scope.peers.length == 2) }">
+						
+						<div id="go-fullscreen">
+							<button class="btn btn-sm btn-default" ng-click="goFullscreen()" title="Fullscreen!"><i class="fa fa-arrows-alt"></i></button>
+						</div>
+
+						<div id="mirror-container">
+							<mirror></mirror>
+						</div>
+						
+						<div id="waiting-for-peers" ng-show="!peers.length">
+							
+							<h3><i class="fa fa-coffee"></i>&nbsp;waiting for others to join...</h3>
+							<h5>Invite people to join with this link:</h5>
+							<h4>{{ room_link }}</h4>
+
+						</div>
+
+						<div id="peer-containers" ng-show="!!peers.length">
+
 							<div class="row">
-								<div class="peer-message-body large-9 columns">
-									{{ msg.content }}
+								
+								<div class="peer-container" ng-class="getColumnSize()" ng-repeat="peer in peers">
+									<peer info="peer"></peer>
 								</div>
-								<div class="peer-message-timestamp large-3 columns text-right">
-									{{ msg.time_received | date: "mediumTime" }}
+
+							</div>
+							
+						</div>
+
+					</div>
+					
+					<div id="all-messages" ng-init="showMessages = true">
+						<div id="all-messages-header">
+							<div class="row">
+								<div class="col-md-8">
+									<h4 class="text-muted"><i class="fa fa-comments-o"></i>&nbsp;Messages</h4>
+								</div>
+
+								<div class="col-md-4" id="caret">
+									<h4 class="text-muted"><i class="fa fa-fw clickable" ng-click="showMessages = !showMessages" ng-class="{ 'fa-caret-down': (showMessages), 'fa-caret-left': (!showMessages) }"></i></h4>
 								</div>
 							</div>
+						</div> <!-- [/all-messages-header] -->
+
+						<div id="messages-window" ng-show="showMessages" class="pin-to-bottom">
+							<div class="peer-message-container" ng-repeat="msg in messages">
+								<div class="peer-message">
+									<div class="row">
+										<div class="col-md-9">
+											<div class="peer-message-body" ng-class="msg.color_code">
+												{{ msg.content }}
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="peer-message-timestamp">
+												{{ msg.time_received | date: 'mediumTime' }}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div> <!-- [/messages-window] -->
+
+						<div id="compose" ng-show="showMessages">
+							<form ng-submit="sendMessage()">
+								<div class="input-group">
+									<input type="text" ng-model="draft" ng-disabled="!peers.length" placeholder="Send a message..." class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary"><i class="fa fa-fw fa-send"></i></button>
+									</span>
+								</div>
+							</form>
 						</div>
 					</div>
-				</div>
-				<div id="compose" ng-show="showMessages">
-					<form ng-submit="sendMessage()">
-						<input type="text" ng-model="draft" ng-disabled="!peers.length" placeholder="Send a message...">
-						<input type="submit" style="display:none;">
-					</form>
+
 				</div>
 			</div>
+
 		</div>
 	</div>
 </div>

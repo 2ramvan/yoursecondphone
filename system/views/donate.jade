@@ -2,10 +2,11 @@ extends layout
 
 block main
 	.row
-		.large-12.columns
-			.panel
-				header: h3: <i class="fa fa-thumbs-o-up"></i>&nbsp;Giving Back to Your Second Phone
-				.panel_body
+		.col-md-12
+			.panel.panel-primary
+				.panel-heading
+					h3.panel-title: <i class="fa fa-thumbs-o-up"></i>&nbsp;Giving Back to Your Second Phone
+				.panel-body
 					p So! You like Your Second Phone so much you feel like donating?! You, are amazing! Truly! There is no better way to express your gratitude than donating money... well maybe there is one other way. (Wow! Not like that! I mean I like my users but, just no.) But seriously, there are a few ways you can truly help Your Second Phone.
 					h4 <i class="fa fa-btc"></i>&nbsp;Donating Money
 					p If you have the means, I accept donations. These funds go towards paying for the servers that run Your Second Phone (there are a few of them), and paying for my coffee (arguably more important than servers), among other things.
@@ -16,6 +17,10 @@ block main
 					h4 <i class="fa fa-globe"></i>&nbsp;Spread the Word
 					p Don't have the loose change to donate? Perfectly fine! Money is tight these days, I get it. But you can help Your Second Phone so much and it will cost you not a cent! Simply spreading the word about how awesome Your Second Phone is goes a very long way, it is just as good as money. I don't care where or how you let people know. Post it on street-posts or your twitter, it makes no difference.
 					p
-						a(href="https://www.facebook.com/sharer.php?u=https://yoursecondphone.co", target="_blank")#fb_share.button.share <i class="fa fa-facebook-square"></i>&nbsp;Share on Facebook
-						a(href="https://twitter.com/home?status=Chat%20with%20anyone%20securely%20and%20for%20free%20at%20@yoursecondphone,%20no%20account%20required%20http://ysp.im", target="_blank")#twitter_share.button.share <i class="fa fa-twitter-square"></i>&nbsp;Share on Twitter
-						a(href="https://plus.google.com/share?url=https://yoursecondphone.co", target="_blank")#gp_share.button.share <i class="fa fa-google-plus-square"></i>&nbsp;Share on Google+
+						.btn-group
+							a.btn.btn-primary(href="https://www.facebook.com/sharer.php?u=https://yoursecondphone.co", target="_blank")
+								<i class="fa fa-facebook-square"></i>&nbsp;Share on Facebook
+							a.btn.btn-primary(href="https://twitter.com/home?status=Chat%20with%20anyone%20securely%20and%20for%20free%20at%20@yoursecondphone,%20no%20account%20required%20http://ysp.im", target="_blank")
+								<i class="fa fa-twitter-square"></i>&nbsp;Share on Twitter
+							a.btn.btn-primary(href="https://plus.google.com/share?url=https://yoursecondphone.co", target="_blank")
+								<i class="fa fa-google-plus-square"></i>&nbsp;Share on Google+

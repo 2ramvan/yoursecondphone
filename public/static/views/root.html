@@ -1,64 +1,86 @@
 <div id="root-view">
   <div class="row">
-    <div class="large-6 columns">
-      <div id="videochat" class="panel animated">
-        <header>
-          <h4><i class="fa fa-video-camera"></i>&nbsp;Video Chat</h4>
-        </header>
-        <div class="panel_body">
+
+    <div class="col-md-6">
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-video-camera"></i>&nbsp;Video Chat</h3>
+        </div>
+        <div class="panel-body">
           <p>Your Second Phone allows you to chat face-to-face with anyone. Simply create a room, send your friend the link and chat for as long as you need, it's <b>free</b>!</p>
         </div>
       </div>
+
     </div>
-    <div class="large-6 columns">
-      <div id="noaccount" class="panel animated">
-        <header>
-          <h4><i class="fa fa-magic"></i>&nbsp;No Account</h4>
-        </header>
-        <div class="panel_body">
+
+    <div class="col-md-6">
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-magic"></i>&nbsp;No Account</h3>
+        </div>
+        <div class="panel-body">
           <p>You don't need to have an account to use Your Second Phone. This helps cut out all of the hurdles that keep you from talking to <i>who</i> you want, <i>when</i> you want.</p>
         </div>
       </div>
+
     </div>
+
   </div>
+
   <div class="row">
-    <div class="large-12 columns">
-      <div id="setup-impossible" ng-show="current_step == -1" class="panel error">
-        <header>
-          <h4><i class="fa fa-frown-o"></i>&nbsp;Incompatible Browser</h4>
-        </header>
-        <div class="panel_body">
-          Your browser is not capable of making video calls, please use the latest version of <a target='_blank' href='https://www.google.com/chrome'>Google Chrome</a>, <a target='_blank' href='https://www.mozilla.org/firefox'>Firefox</a> or <a target='_blank' href='http://www.opera.com/'>Opera</a>.
+    
+    <div class="col-md-12">
+      
+      <div class="panel panel-warning" id="setup-impossible" ng-show="current_step == -1">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-frown-o"></i>&nbsp;Incompatible Browser</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            Your browser is not capable of making video calls, please use the latest version of <a target='_blank' href='https://www.google.com/chrome'>Google Chrome</a>, <a target='_blank' href='https://www.mozilla.org/firefox'>Firefox</a> or <a target='_blank' href='http://www.opera.com/'>Opera</a>.
+          </p>
         </div>
       </div>
-      <div id="setup-step-1" ng-show="current_step == 1" class="panel">
-        <header>
-          <h4><i class="fa fa-video-camera"></i>&nbsp;Step 1: Allow access to webcam!</h4>
-        </header>
-        <div class="panel_body">
-          <p>Your Second Phone needs access to your webcam, click the button below to allow access.</p>
-          <button ng-click="initGum();" ng-disabled="loading_gum"><span ng-show="loading_gum"><i class="fa fa-refresh fa-spin"></i>&nbsp;</span>Get Webcam Access</button>
+
+      <div class="panel panel-primary" id="setup-step-1" ng-show="current_step == 1">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-video-camera"></i>&nbsp;Step 1: Allow access to webcam!</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            Your Second Phone needs access to your webcam, click the button below to allow access.
+          </p>
+          <button class="btn btn-primary" ng-disabled="loading_gum" ng-click="initGum()"><span ng-show="loading_gum"><i class="fa fa-refresh fa-spin"></i>&nbsp;</span>Get Webcam Access</button>
         </div>
       </div>
-      <div id="setup-step-2" ng-show="current_step == 2" class="panel">
-        <header>
-          <h4><i class="fa fa-pencil"></i>&nbsp;Step 2: Pick a name for the conversation!</h4>
-        </header>
-        <div class="panel_body">
-          <p>Here you can pick a specific name for your conversation, this makes you easier to find. If you don't want to pick a name, that is okay, you'll just get a random one.</p>
-          <p ng-hide="!error_message" class="color_red">{{ error_message }}</p>
-          <div class="row">
-            <div class="large-6 columns" style="margin-bottom:1em;">
-              <input type="text" ng-model="room_name" ng-disabled="loading_room" placeholder="Conversation Name" ng-class="{ error: !valid_room_name }">
-            </div>
+
+      <div class="panel panel-primary" id="setup-step-2" ng-show="current_step == 2">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-pencil"></i>&nbsp;Step 2: Pick a name for the conversation!</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            Here you can pick a specific name for your conversation (not for you specifically), this makes you easier to find. If you don't want to pick a name, that is okay, you'll just get a random one.
+          </p>
+          <div ng-show="error_message">
+            <div class="alert alert-danger">{{ error_message }}</div>
           </div>
           <div class="row">
-            <div class="large-6 columns">
-              <button class="expand" ng-click="launchRoom()" ng-disabled="loading_room"><span ng-show="loading_room"><i class="fa fa-refresh fa-spin"></i>&nbsp;</span>Let's Go!</button>
+            <div class="col-md-6">
+              <div class="form-group no-margin">
+                <div class="input-group">
+                  <input type="text" ng-model="room_name" ng-disabled="loading_room" placeholder="Conversation Name" ng-class="{ error: (!valid_room_name) }" class="form-control">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" ng-disabled="loading_room" ng-click="launchRoom()"><span ng-show="loading_rum"><i class="fa fa-refresh fa-spin"></i>&nbsp;</span>Let's Go!</button>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </div> <!--[ .col-md-12 ]-->
+  </div> <!--[ /.row ]-->
+</div> <!--[ /#root-view ]-->

@@ -65,6 +65,12 @@ app.use(express.static(__dirname + '/../public'));
 app.use(logger('common'));
 
 // Done with middleware - wire up routes
+app.get('/source', function(req, res) {
+  res.redirect('https://github.com/yoursecondphone/yoursecondphone');
+});
+app.get('/issues', function(req, res) {
+  res.redirect('https://github.com/yoursecondphone/yoursecondphone/issues');
+});
 app.get('/about', basic.render('about'));
 app.get('/donate', basic.render('donate'));
 app.get('/privacy', basic.render('privacy'));

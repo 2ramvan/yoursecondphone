@@ -39,7 +39,7 @@
 				}
 
 			},
-			template: "<video autoplay class='peer_window'></video><div class='peer_color' ng-class='peer.color_code'></div>"
+			template: "<video autoplay class='peer-window'></video><div class='peer-color' ng-class='peer.color_code'></div>"
 		}
 
 	}])
@@ -50,17 +50,21 @@
 			link: function(scope, element, attrs) {
 				var video_window = element.children()[0];
 
-				if(GumService.isInvoked()){
+				if(GumService.getMediaStream()){
 					attachMediaStream(video_window, GumService.getMediaStream());
+				} else {
+					GumService.invoke();
 				}
 
-				GumService.on("active", function(stream) {
-					attachMediaStream(video_window, stream);
-					$(element).removeClass("inactive");
-				});
-
-				GumService.on("inactive", function() {
-					$(element).addClass("inactive");
+				scope.$watch(function() {
+					return GumService.getMediaStream();
+				}, function(ms) {
+					if (ms) {
+						attachMediaStream(video_window, ms);
+						$(element).removeClass('inactive');
+					} else {
+						$(element).addClass('inactive');
+					}
 				});
 
 			},
