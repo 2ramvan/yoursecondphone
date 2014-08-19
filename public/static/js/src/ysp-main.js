@@ -52,8 +52,8 @@
     }
   ])
 
-  .factory("ApplicationError", ["$log", "$location", "$rootScope",
-    function($log, $location, $rootScope) {
+  .factory("ApplicationError", ["$log", "$location", "$rootScope", "$timeout",
+    function($log, $location, $rootScope, $timeout) {
 
       function ApplicationError(type, panic) {
         if (!this instanceof ApplicationError) return new ApplicationError(type, panic);
