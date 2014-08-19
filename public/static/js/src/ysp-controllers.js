@@ -15,20 +15,22 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
 
  */
 
-  .controller('ErrorCtrl', ['$log', '$scope', '$routeParams', 'peer_server_port',
-    function($log, $scope, $routeParams, peer_server_port) {
+  .controller('ErrorCtrl', ['$log', '$scope', '$routeParams', 'peer_server_port', '$sce',
+    function($log, $scope, $routeParams, peer_server_port, $sce) {
 
       function neg(error) {
-        return 'Your Second Phone is unable to communicate with the server. Make sure that your firewall isn\'t blocking access to port ' + peer_server_port + '. These are important to Your Second Phone working. Or the server could be down, if this error keeps happening even after you check your firewall, please report it to <a href=\'https://twitter.com/home?status=@yoursecondphone%20I\'m%20getting%20a%20%22' + error + '%22.%20Please%20help!\' target=\'_blank\'>@yoursecondphone</a>';
+        return $sce.trustAsHtml('Your Second Phone is unable to communicate with the server. This is probably because your firewall is blocking access to port <b>' + peer_server_port + '</b>. These are vital to <b>Your Second Phone</b> working.');
       }
 
       var error_descriptions = {
-        'no-webcam': 'Your Second Phone was denied access to the webcam!',
+        'no-webcam': 'Your Second Phone was denied access to the webcam, or their is not one available!',
         'server-error': neg('server-error'),
         'browser-incompatible': 'Your browser is not capable of making video calls, please use the latest version of <a target="_blank" href="https://www.google.com/chrome">Google Chrome</a>, <a target="_blank" href="https://www.mozilla.org/firefox">Firefox</a> or <a target="_blank" href="http://www.opera.com/">Opera</a>',
         'ssl-unavailable': 'An error was encountered while attempting to establish a secure connection with the server.',
         'socket-error': neg('socket-error'),
-        'socket-io-error': neg('socket-io-error')
+        'socket-io-error': neg('socket-io-error'),
+        'timed-out': neg('timed-out'),
+        'room-full': 'There are already 3 people in this room, which is the limit for rooms.'
       };
 
       $scope.error_id = $routeParams.err_type;
