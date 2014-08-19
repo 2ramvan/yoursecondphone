@@ -1,12 +1,14 @@
 <div id="root-view">
-	<div class="panel error">
-		<header>
-			<h4><i class="fa fa-exclamation-triangle"></i>&nbsp;Fatal Error ({{ error_id }})</h4>
-		</header>
-		<div class="panel_body">
+	<div class="panel panel-danger">
+		<div class="panel-heading">
+			<h3 class="panel-title"><i class="fa fa-exclamation-triangle"></i>&nbsp;Fatal Error ({{ error_id }})</h3>
+		</div>
+		<div class="panel-body">
 			<p ng-bind-html="error_description"></p>
 			<!-- [ intentionally linking to unsecure protocol, ysp will upgrade to secure automatically ] -->
-			<p><a href="http://yoursecondphone.co">Restart</a></p>
+			<p class="no-margin">
+				<a href="http://yoursecondphone.co" class="btn btn-danger">Restart</a>
+			</p>
 		</div>
 	</div>
 </div>

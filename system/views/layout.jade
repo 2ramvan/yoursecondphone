@@ -15,39 +15,46 @@ html(lang="en", class="no-js")
 		meta(property="og:image:url", content="http://yoursecondphone.co/static/img/ogp.png")
 		meta(property="og:image:secure_url", content="https://yoursecondphone.co/static/img/ogp.png")
 
-		link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.0/normalize.min.css")
-		link(rel="stylesheet", href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.2.2/css/foundation.min.css")
-		link(rel="stylesheet", href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
 		link(rel="stylesheet", href="//fonts.googleapis.com/css?family=Aldrich")
-		link(rel="stylesheet", href="/static/css/animate.min.css")
 		block css
 		link(rel="stylesheet", href="/static/css/main.css")
 	body(id=page_id)
-		.row
-			.large-10.large-centered.columns: header#global_header: a(href="/"): h2(class="no-margin") Your Second Phone
-		.row
-			.large-10.large-centered.columns
-				#page_content: block main
-		.row
-			.large-10.large-centered.columns
-				footer#global_footer
-					ul.inline-list
-						li: a(href="/about") <i class="fa fa-info-circle"></i>&nbsp;About
-						li: a(href="/privacy") <i class="fa fa-eye"></i>&nbsp;Privacy
-						li: a(href="https://github.com/yoursecondphone") <i class="fa fa-github-alt"></i>&nbsp;GitHub
-						li: a(href="https://github.com/yoursecondphone/yoursecondphone/issues/new", target="_blank") <i class="fa fa-bug"></i>&nbsp;Report a Bug
-						li: a(href="/terms") <i class="fa fa-legal"></i>&nbsp;Terms of Service
-						li: a(href="/donate") <i class="fa fa-beer"></i>&nbsp;Donate
-					#copyright
-						small &copy; 2014 yoursecondphone (Licensed Under Apache 2.0)
-					#twitter
-						a(href="https://twitter.com/yoursecondphone", class="twitter-follow-button", data-show-count="true", data-show-screen-name="false", data-dnt="true") Follow @yoursecondphone
-						script.
-							!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.container-fluid
+						.row
+							.col-md-12
+								header#global-header: a(href="/"): h1 Your Second Phone
+			.row
+				.col-md-8.col-md-offset-2
+					.container-fluid
+						.row
+							.col-md-12
+								#page-content
+									block main
+			.row
+				.col-md-8.col-md-offset-2
+					.container-fluid
+						.row
+							.col-md-12
+								footer#global-footer
+									ul.list-inline#links
+										li: a(href="/about") <i class="fa fa-info-circle"></i>&nbsp;About
+										li: a(href="/privacy") <i class="fa fa-eye"></i>&nbsp;Privacy
+										li: a(href="/source") <i class="fa fa-github-alt"></i>&nbsp;GitHub
+										li: a(href="/issues", target="_blank") <i class="fa fa-bug"></i>&nbsp;Report a Bug
+										li: a(href="/terms") <i class="fa fa-legal"></i>&nbsp;Terms of Service
+										li: a(href="/donate") <i class="fa fa-beer"></i>&nbsp;Donate
+									#copyright
+										small &copy; 2014 yoursecondphone (Licensed Under Apache 2.0)
+									#twitter
+										a(href="https://twitter.com/yoursecondphone", class="twitter-follow-button", data-show-count="true", data-show-screen-name="false", data-dnt="true") Follow @yoursecondphone
+										script.
+											!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 		//- Load jQuery
 		script(src="/static/js/ga.js")
-		script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js")
-		script(src="//cdnjs.cloudflare.com/ajax/libs/sugar/1.3.9/sugar.min.js")
+		script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js")
 
 		block js
 		if show_ad
