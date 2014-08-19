@@ -51,8 +51,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 
  */
 
-  .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'supportsRealTimeCommunication', 'coordinator', '$timeout',
-    function($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, $timeout) {
+  .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'supportsRealTimeCommunication', 'coordinator', 'ApplicationError', '$timeout',
+    function($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, ApplicationError, $timeout) {
       $scope.current_step = 0;
 
       if (supportsRealTimeCommunication()) {
@@ -61,6 +61,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
         $scope.current_step = -1;
       }
 
+      $scope.error_message = '';
       $scope.room_name = '';
       $scope.valid_room_name = true;
 
@@ -70,18 +71,25 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
           return;
         }
 
-        $scope.valid_room_name = newVal.match(/^\w(\w|-){1,30}$/);
+        $scope.valid_room_name = (/^\w(\w|-){1,30}$/).test(newVal);
       });
 
       $scope.loading_gum = false;
-
       $scope.initGum = function() {
         $scope.loading_gum = true;
-        GumService.once('active', function() {
+
+        GumService.invoke()
+
+        .then(function() {
           $scope.current_step += 1;
           $timeout(angular.noop);
+        }, function(err) {
+          return new ApplicationError('no-webcam', true);
+        })
+
+        .finally(function() {
+          $scope.loading_gum = false;
         });
-        GumService.invoke();
       };
 
       $scope.loading_room = false;
@@ -123,12 +131,15 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
  */
 
-  .controller("RoomCtrl", ["$timeout", "$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
-    function($timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
+  .controller("RoomCtrl", ["$q", "$timeout", "$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
+    function($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
 
-      if (!supportsRealTimeCommunication()) {
+      global.window.onbeforeunload = function() {
+        return 'Are you sure you want to leave?';
+      } 
+
+      if (!supportsRealTimeCommunication())
         return new ApplicationError("browser-incompatible", true);
-      }
 
       $scope.room_id = $routeParams.room_id;
       $scope.room_link = "http://ysp.im/#/" + $routeParams.room_id;
@@ -139,15 +150,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
       $scope.isFullscreen = false;
 
-      // ng-class helper that plainly states the number of peers connected
-      $scope.getNumPeers = function() {
-        var nums = ["zero", "one", "two"];
-        return nums[$scope.peers.length];
-      };
-
       // ng-class helper that helps the peer holders determine the correct column size
       $scope.getColumnSize = function() {
-        var nums = ["large-12", "large-12", "large-6"];
+        var nums = ['col-md-12', 'col-md-12', 'col-md-6'];
         return nums[$scope.peers.length];
       };
 
@@ -193,7 +198,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       });
 
       // here is where we tear down
-      $rootScope.$on("$routeChangeStart", function() {
+      $rootScope.$on("$routeChangeStart", function(e) {
         coordinator.leave_room($routeParams.room_id);
         coordinator.removeAllListeners();
         $(document).off(fullscreen.raw.fullscreenchange);
@@ -212,42 +217,14 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         });
       });
 
-      // preflight check
-      async.waterfall([
-
-        function(callback) {
-          // lets lump gumservice init and coordinator init in one parallel function
-          async.parallel([
-
-            function(callback) {
-              if (GumService.isInvoked()) {
-                return callback(null);
-              } else {
-                GumService.once("active", function() {
-                  return callback(null);
-                });
-                GumService.invoke();
-              }
-            },
-            function(callback) {
-              if (coordinator.isReady()) {
-                callback(null);
-              } else {
-                coordinator.once("ready", function() {
-                  callback(null);
-                });
-              }
-            }
-          ], function(err) {
-            callback(null);
-          });
-        },
-        function(callback) {
-          coordinator.join_room($scope.room_id, callback);
-        }
-      ], function(err, roomies) {
-        if (err)
-          return new ApplicationError(err);
+      $q.all([
+        GumService.invoke(), 
+        coordinator.promiseUntilReady()
+      ])
+      .then(function() {
+        return coordinator.join_room($scope.room_id);
+      })
+      .then(function(roomies) {
 
         var mc_pool = {}; // Put orphan MediaConnections here, wait for their DirectConnection
         var dc_pool = {}; // visa-versa
@@ -354,6 +331,17 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
           var new_peer = new PeerWrapper(peer_id);
           attachEventsAndPush(new_peer);
         });
+
+      })
+
+      .catch(function(err) {
+        return new ApplicationError(err, true);
+        // expecting
+
+        // no-webcam
+        // browser-incompatible
+        // room-full
+        // timed-out
 
       });
 
