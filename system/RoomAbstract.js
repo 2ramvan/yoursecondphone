@@ -42,24 +42,5 @@ RoomAbstract.prototype.getOtherPeers = RoomAbstract.prototype.getPeers;
 RoomAbstract.prototype.isEmpty = function() {
   return !this.peers.length;
 }
-// RoomAbstract.prototype.broadcast = function() {
-//   var args = Array.prototype.slice.call(arguments);
-//   var exclude = args.shift();
-
-//   var audience = this.peers.filter(function(peer_id) {
-//     return peer_id != exclude;
-//   });
-
-//   async.map(audience, function(_peer_id, cb) {
-//     cb(null, sockets.get(_peer_id));
-//   }, function(err, sockets) {
-//     async.each(sockets, function(socket, cb) {
-//       if (!!socket) {
-//         socket.emit.apply(socket, args);
-//       }
-//       cb(null);
-//     })
-//   })
-// }
 
 module.exports = RoomAbstract;
