@@ -190,8 +190,16 @@ describe('coordinator', function() {
     var dummies = [];
 
     // create the dummies
-    for (var i = 0; i < num_dummies; i++)
-      dummies.push(new events.EventEmitter());
+    for (var i = 0; i < num_dummies; i++){
+      // to properly emulate room broadcasts, attach a unique id
+      // to the dummies
+      
+      var id = _.uniqueId('socket_');
+      var d = new events.EventEmitter();
+      d.id = id;
+
+      dummies.push(d);
+    }
 
     // here is where it gets interesting
     return {
@@ -206,6 +214,10 @@ describe('coordinator', function() {
           // and give the test the array of dummies so it can set up a scenario
           callback(dummies);
         }
+      },
+      // emulate room broadcasts
+      to: function(room) {
+        return _.find(dummies, { id: room });
       }
     };
   };
