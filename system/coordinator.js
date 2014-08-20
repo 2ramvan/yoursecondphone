@@ -1,5 +1,5 @@
 'use strict';
-var _, async, fs, util, lru, rooms, debug, sockets, RoomAbstract;
+var _, async, fs, util, rooms, debug, sockets, RoomAbstract;
 
 // 3rd party
 _ = require('lodash');
@@ -8,11 +8,9 @@ debug = require('debug')('coordinator');
 
 RoomAbstract = require('./RoomAbstract');
 
-lru = require('lru-cache');
-sockets = lru({
-  maxAge: (1000 * 60 * 60 * 24)
-});
-rooms = lru({
+sockets = {};
+
+rooms = require('lru-cache')({
   maxAge: (1000 * 60 * 60 * 24)
 });
 
@@ -33,13 +31,8 @@ function register_coordinator(io) {
 
       debug('new peer: %s', peer_id);
 
-      // if there is already a peer with this id, check if connected
-      if (sockets.has(peer_id)) {
-        sockets.del(peer_id);
-      }
-
       socket.peer_id = peer_id;
-      sockets.set(peer_id, socket);
+      sockets[peer_id] = socket.id;
       ack(null);
     });
 
@@ -87,11 +80,12 @@ function register_coordinator(io) {
             rooms.del(room_id);
           else {
             var audience = _.map(room.getPeers(), function(peer_id) {
-              return sockets.get(peer_id);
+              return sockets[peer_id];
             });
 
-            audience.forEach(function(peer) {
-              peer.emit('peer_left', pid);
+            _.forEach(audience, function(socket_id) {
+              if (socket_id)
+                io.to(socket_id).emit('peer_left', pid);
             });
           }
         }
@@ -110,10 +104,9 @@ function register_coordinator(io) {
 
       debug('%s has disconnected', socket.peer_id);
 
-      sockets.del(socket.peer_id);
+      delete sockets[socket.peer_id];
 
       var disc_peer_id = socket.peer_id;
-      socket = null;
 
       rooms.forEach(function(room, room_id, rooms) {
         if (room.removePeer(disc_peer_id)) {
@@ -122,15 +115,18 @@ function register_coordinator(io) {
           else {
             // broadcast
             var audience = _.map(room.getPeers(), function(peer_id) {
-              return sockets.get(peer_id);
+              return sockets[peer_id];
             });
 
-            audience.forEach(function(peer, idx, arr) {
-              peer.emit('peer_left', disc_peer_id);
+            _.forEach(audience, function(socket_id) {
+              if (socket_id)
+                io.to(socket_id).emit('peer_left', disc_peer_id);
             });
           }
         }
       });
+
+      socket = null;
     });
 
   });
