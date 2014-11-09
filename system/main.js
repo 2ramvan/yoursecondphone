@@ -1,23 +1,24 @@
+'use strict';
+
 process.title = 'your second phone';
-var express, compression, timeout, logger, spdy, http, basic, middleware, config, sio, io, server, app, helmet;
 
 // third-party dependencies
-express = require('express');
-compression = require('compression');
-timeout = require('connect-timeout');
-logger = require('morgan');
-spdy = require('spdy');
-sio = require('socket.io');
-helmet = require('helmet');
+var express = require('express'),
+    compression = require('compression'),
+    timeout = require('connect-timeout'),
+    logger = require('morgan'),
+    spdy = require('spdy'),
+    sio = require('socket.io'),
+    helmet = require('helmet');
 
 // node.js dependencies
-http = require('http');
+var http = require('http');
 
 // internal dependencies
-basic = require('./basic');
-middleware = require('./middleware');
-config = require('../ysp_config');
-coordinator = require('./coordinator');
+var basic = require('./basic'),
+    middleware = require('./middleware'),
+    config = require('../ysp_config'),
+    coordinator = require('./coordinator');
 
 app = express();
 
