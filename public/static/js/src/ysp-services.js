@@ -57,8 +57,12 @@ o888o
       peer.on("error", function(err) {
         if (err.type == 'network') {
           // prevent redundant reconnect operations
-          if (attempting_to_reconnect) return;
-          else attempting_to_reconnect = true;
+          if (attempting_to_reconnect)
+            return;
+          else {
+            attempting_to_reconnect = true;
+            $rootScope.disconnected = true;
+          }
 
           $log.debug('peer: lost connection to signaling server');
 
@@ -78,6 +82,7 @@ o888o
 
           peer.once("open", function() {
             attempting_to_reconnect = false;
+            $rootScope.disconnected = false;
 
             $interval.cancel(itvl);
             $log.debug('peer: reconnected!!');
