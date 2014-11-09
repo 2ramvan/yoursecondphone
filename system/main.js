@@ -9,7 +9,8 @@ var express = require('express'),
     logger = require('morgan'),
     spdy = require('spdy'),
     sio = require('socket.io'),
-    helmet = require('helmet');
+    helmet = require('helmet'),
+    expressPeerServer = require('peer').ExpressPeerServer;
 
 // node.js dependencies
 var http = require('http');
@@ -19,7 +20,8 @@ var basic = require('./basic'),
     config = require('../ysp_config'),
     coordinator = require('./coordinator');
 
-app = express();
+var app = express(),
+    server = spdy.createServer(config.ssl, app);
 
 app.use(helmet.xframe('deny'));
 app.use(helmet.hsts({
@@ -58,6 +60,10 @@ app.use(compression());
 // Set the static resoureces directory
 app.use(express.static(__dirname + '/../public'));
 
+// mount peer server on express
+// keep this north of the logger!
+app.use('/peers', expressPeerServer(server));
+
 // Let's do some logging
 app.use(logger('combined'));
 
@@ -77,18 +83,16 @@ app.get('/', basic.index);
 app.use(basic.render('not_found', 404));
 app.use(basic.server_error);
 
-server = spdy.createServer(config.ssl, app).listen(443);
-
-io = sio(server, {
+// mount socket.io on the express server (under /coordinator)
+var io = sio(server, {
   path: '/coordinator'
 });
+
+// register events
 coordinator(io);
 
-http.Server(app).listen(80);
-(require('peer').PeerServer)({
-  port: 8080,
-  ssl: config.ssl,
-  path: '/peers',
-  origins: 'https://yoursecondphone.co'
-});
+// listen and redirect on unsecured http
+require('http').Server(app).listen(80);
+
+// listen on secure SPDY/3.1
 server.listen(443);
