@@ -7,6 +7,9 @@
 					<h3 class="panel-title"><i class="fa fa-video-camera"></i>&nbsp;ID:&nbsp;{{ room_id }}</h3>
 				</div>
 				<div class="panel-body">
+					
+					<div class="alert alert-danger" ng-hide="navOnline"><i class="fa fa-warning"></i>&nbsp;you appear to be disconnected from the internet!</div>
+					<div class="alert alert-warning" ng-show="disconnected">lost contact with peer server, attempting to reconnect...</div>
 
 					<div id="all-streams" ng-class="{ fullscreen: isFullscreen, zero: ($scope.peers.length == 0), one: ($scope.peers.length == 1), two: ($scope.peers.length == 2) }">
 						
