@@ -45,9 +45,6 @@ app.set('view engine', 'jade');
 // Watch for timeouts
 app.use(timeout());
 
-// Never allow unsecured HTTP requests on anything, always redirect to HTTPS
-app.use(middleware.redirect_to_secure());
-
 // keep pingdom out of the logs
 app.use(function(req, res, next) {
   if ((/pingdom/i).test(req.get('user-agent')))
