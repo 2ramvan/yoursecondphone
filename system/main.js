@@ -27,9 +27,17 @@ app.use(helmet.xframe('deny'));
 app.use(helmet.hsts({
   // one year
   maxAge: (1000 * 60 * 60 * 24 * 7 * 4.345 * 12),
-  includeSubdomains: true
+  includeSubdomains: true,
+  preload: true
 }));
 app.use(helmet.hidePoweredBy());
+
+app.use(function redirectToSecure(req, res, next) {
+  if (req.secure)
+    next();
+  else
+    res.redirect(301, 'https://yoursecondphone.co');
+});
 
 app.locals = {
   show_ad: false,
