@@ -40,8 +40,8 @@
     }
   ])
 
-  .run(["$log", "peer", "coordinator", "ApplicationError",
-    function($log, peer, coordinator, ApplicationError) {
+  .run(["$log", "peer", "coordinator", "ApplicationError", "$interval", "$rootScope",
+    function($log, peer, coordinator, ApplicationError, $interval, $rootScope) {
       if (peer.open) {
         coordinator.advertise_peer_id();
       } else {
@@ -49,6 +49,15 @@
           coordinator.advertise_peer_id();
         });
       }
+
+      if (_.isObject(navigator) && _.isBoolean(navigator.onLine)) {
+        $log.debug('observing online state');
+
+        $interval(function(){
+          $rootScope.navOnline = navigator.onLine;
+        }, 50);
+      }
+
     }
   ])
 
