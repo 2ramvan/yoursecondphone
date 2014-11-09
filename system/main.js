@@ -16,7 +16,6 @@ var http = require('http');
 
 // internal dependencies
 var basic = require('./basic'),
-    middleware = require('./middleware'),
     config = require('../ysp_config'),
     coordinator = require('./coordinator');
 
