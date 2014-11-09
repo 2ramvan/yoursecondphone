@@ -5,7 +5,7 @@
 
   .constant('main_host', 'yoursecondphone.co')
 
-  .constant('peer_server_port', 8080)
+  .constant('peer_server_port', 443)
 
   .value('fullscreen', screenfull)
 
