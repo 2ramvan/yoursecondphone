@@ -134,10 +134,6 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
   .controller("RoomCtrl", ["$q", "$timeout", "$log", "$scope", "GumService", "$location", "$routeParams", "coordinator", "ApplicationError", "PeerWrapper", "peer", "fullscreen", "$random", "$rootScope", "supportsRealTimeCommunication",
     function($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
 
-      global.window.onbeforeunload = function() {
-        return 'Are you sure you want to leave?';
-      } 
-
       if (!supportsRealTimeCommunication())
         return new ApplicationError("browser-incompatible", true);
 
