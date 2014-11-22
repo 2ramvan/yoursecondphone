@@ -1,6 +1,15 @@
 (function(global) {
   'use strict';
 
+  global.$debug = function enableDebug(setTo) {
+    if (_.isBoolean(setTo) && !!sessionStorage) {
+      sessionStorage.debug = setTo;
+
+      if (global.location && _.isFunction(location.reload))
+        location.reload();
+    }
+  }
+
   angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize'])
 
   .constant('main_host', 'yoursecondphone.co')
@@ -11,7 +20,7 @@
 
   .config(['$logProvider',
     function($logProvider) {
-      $logProvider.debugEnabled(false);
+      $logProvider.debugEnabled((!!sessionStorage) && sessionStorage.debug === 'true');
     }
   ])
 
