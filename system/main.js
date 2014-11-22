@@ -103,4 +103,4 @@ coordinator(io);
 require('http').Server(app).listen(80);
 
 // listen on secure SPDY/3.1
-server.listen(443);
+server.listen(443, '::');
