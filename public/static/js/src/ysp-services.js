@@ -38,7 +38,13 @@ o888o
         host: main_host,
         port: peer_server_port,
         path: '/peers',
-        secure: true
+        secure: true,
+        config: {
+          iceServers: [
+            { url: 'stun:stun.l.google.com:19302' },
+            { url: 'turn:hotel.nkcmr.net:3478' }
+          ]
+        }
       });
 
       peer.on("open", function(id) {
