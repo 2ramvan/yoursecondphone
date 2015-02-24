@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
   'use strict'
 
   /*
@@ -21,7 +21,7 @@ o888ooooood8 d888b    d888b    `Y8bod8P' d888b     `Y8bood8P'    "888" d888b    
  */
 
   .controller('ErrorCtrl', ['$log', '$scope', '$routeParams', 'peer_server_port', '$sce',
-    function($log, $scope, $routeParams, peer_server_port, $sce) {
+    function ($log, $scope, $routeParams, peer_server_port, $sce) {
       function neg () {
         return $sce.trustAsHtml('Your Second Phone is unable to communicate with the server. This is probably because your firewall is blocking access to port <b>' + peer_server_port + '</b>. These are vital to <b>Your Second Phone</b> working.')
       }
@@ -53,7 +53,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 */
 
   .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'supportsRealTimeCommunication', 'coordinator', 'ApplicationError', '$timeout',
-    function($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, ApplicationError, $timeout) {
+    function ($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, ApplicationError, $timeout) {
       $scope.current_step = 0
 
       if (supportsRealTimeCommunication()) {
@@ -66,7 +66,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
       $scope.room_name = ''
       $scope.valid_room_name = true
 
-      $scope.$watch('room_name', function(newVal, oldVal) {
+      $scope.$watch('room_name', function (newVal, oldVal) {
         if (newVal === '') {
           $scope.valid_room_name = true
           return
@@ -76,38 +76,38 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
       })
 
       $scope.loading_gum = false
-      $scope.initGum = function() {
+      $scope.initGum = function () {
         $scope.loading_gum = true
 
         GumService.invoke()
 
-        .then(function() {
+        .then(function () {
           $scope.current_step += 1
           $timeout(angular.noop)
         }, function () {
           return new ApplicationError('no-webcam', true)
         })
 
-        .finally(function() {
+        .finally(function () {
           $scope.loading_gum = false
         })
       }
 
       $scope.loading_room = false
       $scope.error_message = ''
-      $scope.launchRoom = function() {
+      $scope.launchRoom = function () {
         $scope.loading_room = true
         $log.debug('Launching room... %s', $scope.room_name)
 
         if (!$scope.valid_room_name || $scope.room_name === '')
           $scope.room_name = $random.string(10)
 
-        coordinator.room_exists($scope.room_name, function(exists) {
+        coordinator.room_exists($scope.room_name, function (exists) {
           $scope.loading_room = false
           if (exists) {
             $scope.error_message = 'Sorry, that room name is already taken.'
             $timeout(angular.noop)
-            $timeout(function() {
+            $timeout(function () {
               $scope.error_message = ''
             }, 5000)
           } else {
@@ -130,7 +130,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
  */
 
   .controller('RoomCtrl', ['$q', '$timeout', '$log', '$scope', 'GumService', '$location', '$routeParams', 'coordinator', 'ApplicationError', 'PeerWrapper', 'peer', 'fullscreen', '$random', '$rootScope', 'supportsRealTimeCommunication',
-    function($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
+    function ($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
       if (!supportsRealTimeCommunication())
         return new ApplicationError('browser-incompatible', true)
 
@@ -144,21 +144,21 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       $scope.isFullscreen = false
 
       // ng-class helper that helps the peer holders determine the correct column size
-      $scope.getColumnSize = function() {
+      $scope.getColumnSize = function () {
         var nums = ['col-md-12', 'col-md-12', 'col-md-6']
         return nums[$scope.peers.length]
       }
 
       // goFullscreen if you need help determining what this does, study code a bit more
-      $scope.goFullscreen = function() {
+      $scope.goFullscreen = function () {
         fullscreen.request(document.querySelector('div#all-streams'))
         $timeout(angular.noop)
       }
 
-      $scope.sendMessage = function() {
+      $scope.sendMessage = function () {
         if ($scope.draft) {
           if ($scope.peers.length) {
-            async.each($scope.peers, function(peer, cb) {
+            async.each($scope.peers, function (peer, cb) {
               peer.send('message', $scope.draft)
               cb(null)
             }, function () {
@@ -186,26 +186,26 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       }
 
       // apply the scope when fullscreen state changes
-      $(document).on(fullscreen.raw.fullscreenchange, function() {
+      $(document).on(fullscreen.raw.fullscreenchange, function () {
         $timeout(angular.noop)
       })
 
       // here is where we tear down
-      $rootScope.$on('$routeChangeStart', function(e) {
+      $rootScope.$on('$routeChangeStart', function (e) {
         coordinator.leave_room($routeParams.room_id)
         coordinator.removeAllListeners()
         $(document).off(fullscreen.raw.fullscreenchange)
       })
 
       // reflect fullscreen indicator to the scope
-      $scope.$watch(function() {
+      $scope.$watch(function () {
         return fullscreen.isFullscreen
-      }, function(newVal) {
+      }, function (newVal) {
         $scope.isFullscreen = newVal
       })
 
-      $scope.$on('peer:reconnect', function() {
-        coordinator.once('ready', function() {
+      $scope.$on('peer:reconnect', function () {
+        coordinator.once('ready', function () {
           coordinator.join_room($scope.room_id)
         })
       })
@@ -214,14 +214,14 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         GumService.invoke(),
         coordinator.promiseUntilReady()
       ])
-      .then(function() {
+      .then(function () {
         return coordinator.join_room($scope.room_id)
       })
-      .then(function(roomies) {
+      .then(function (roomies) {
         var mc_pool = {} // Put orphan MediaConnections here, wait for their DirectConnection
         var dc_pool = {} // visa-versa
 
-        peer.on('call', function(mc) {
+        peer.on('call', function (mc) {
           if (!dc_pool.hasOwnProperty(mc.peer)) {
             $log.debug('mc(%s) received before dc, waiting...', mc.peer)
             mc_pool[mc.peer] = mc
@@ -235,7 +235,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
           }
         })
 
-        peer.on('connection', function(dc) {
+        peer.on('connection', function (dc) {
           if (!mc_pool.hasOwnProperty(dc.peer)) {
             $log.debug('dc(%s) received before mc, waiting...', dc.peer)
             dc_pool[dc.peer] = dc
@@ -262,7 +262,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
           taken_colors.push(peerWrapper.color_code)
 
           // once the peer closes up shop, lets do the same and disconnect all events and such
-          peerWrapper.once('close', function(id) {
+          peerWrapper.once('close', function (id) {
             // relinquish the color
             var i = taken_colors.indexOf(peerWrapper.color_code)
             taken_colors.splice(i, 1)
@@ -270,13 +270,13 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
             $log.debug('peer(%s) closed, pruning...', id)
 
             // remove it from the array
-            $scope.peers = $scope.peers.filter(function(peer) {
+            $scope.peers = $scope.peers.filter(function (peer) {
               return peer.id !== id
             })
             $timeout(angular.noop)
           })
 
-          peerWrapper.on('message', function(message) {
+          peerWrapper.on('message', function (message) {
             // form the message
             var msg = {}
 
@@ -295,7 +295,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         }
 
         // this is the primary way of knowing when someone has left
-        coordinator.on('peer_left', function(id) {
+        coordinator.on('peer_left', function (id) {
           $log.debug('[RoomCtrl] - coordinator said that (%s) left', id)
 
           var peerw = _.find($scope.peers, { id: id })
@@ -306,7 +306,7 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
             var idx = taken_colors.indexOf(peerw.color_code)
             if (idx >= 0) taken_colors.splice(idx, 1)
 
-            $scope.peers = $scope.peers.filter(function(peer) {
+            $scope.peers = $scope.peers.filter(function (peer) {
               return peer.id !== id
             })
 
@@ -317,13 +317,13 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         })
 
         // process peers given by the coordinator
-        roomies.forEach(function(peer_id, index, roomies_internal_ref) {
+        roomies.forEach(function (peer_id, index, roomies_internal_ref) {
           var new_peer = new PeerWrapper(peer_id)
           attachEventsAndPush(new_peer)
         })
       })
 
-      .catch(function(err) {
+      .catch(function (err) {
         return new ApplicationError(err, true)
         // expecting
 

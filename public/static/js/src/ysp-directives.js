@@ -9,13 +9,13 @@
 
   angular.module('ysp-directives', [])
 
-  .directive('pinToBottom', ['$log', '$rootScope', '$timeout', function($log, $rootScope, $timeout) {
+  .directive('pinToBottom', ['$log', '$rootScope', '$timeout', function ($log, $rootScope, $timeout) {
     return {
       restrict: 'C',
-      link: function(scope, element, attrs) {
+      link: function (scope, element, attrs) {
         element = element[0]
-        $rootScope.$on('ysp:message', function(event) {
-          $timeout(function() {
+        $rootScope.$on('ysp:message', function (event) {
+          $timeout(function () {
             $(element).scrollTop(element.scrollHeight + 200)
           }, 75)
         })
@@ -23,19 +23,19 @@
     }
   }])
 
-  .directive('peer', ['$log', function($log) {
+  .directive('peer', ['$log', function ($log) {
     return {
       restrict: 'E',
       scope: {
         peer: '=info'
       },
-      link: function(scope, element, attrs) {
+      link: function (scope, element, attrs) {
         var video_window = element.children()[0]
 
         if (scope.peer.ms) {
           attachMediaStream(video_window, scope.peer.ms)
         } else {
-          scope.peer.once('stream', function() {
+          scope.peer.once('stream', function () {
             attachMediaStream(video_window, scope.peer.ms)
           })
         }
@@ -44,10 +44,10 @@
     }
   }])
 
-  .directive('mirror', ['$log', 'GumService', function($log, GumService) {
+  .directive('mirror', ['$log', 'GumService', function ($log, GumService) {
     return {
       restrict: 'E',
-      link: function(scope, element, attrs) {
+      link: function (scope, element, attrs) {
         var video_window = element.children()[0]
 
         if (GumService.getMediaStream()) {
@@ -56,9 +56,9 @@
           GumService.invoke()
         }
 
-        scope.$watch(function() {
+        scope.$watch(function () {
           return GumService.getMediaStream()
-        }, function(ms) {
+        }, function (ms) {
           if (ms) {
             attachMediaStream(video_window, ms)
             $(element).removeClass('inactive')

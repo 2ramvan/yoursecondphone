@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
   'use strict'
 
   /*
@@ -13,8 +13,8 @@
   angular.module('ysp-services', [])
 
   .service('supportsRealTimeCommunication', ['$log',
-    function($log) {
-      return function() {
+    function ($log) {
+      return function () {
         if (!global.util.supports.audioVideo || !global.util.supports.data) {
           return false
         } else {
@@ -37,7 +37,7 @@ o888o
  */
 
   .service('peer', ['$log', 'main_host', 'peer_server_port', 'ApplicationError', '$timeout', '$interval', '$rootScope',
-    function($log, main_host, peer_server_port, ApplicationError, $timeout, $interval, $rootScope) {
+    function ($log, main_host, peer_server_port, ApplicationError, $timeout, $interval, $rootScope) {
       var is_reconnect = false
       var attempting_to_reconnect = false
 
@@ -48,7 +48,7 @@ o888o
         secure: true
       })
 
-      peer.on('open', function(id) {
+      peer.on('open', function (id) {
         $log.debug('peer: main peer connection open (%s)', id)
 
         if (!is_reconnect)
@@ -57,11 +57,11 @@ o888o
           $rootScope.$broadcast('peer:reconnect')
       })
 
-      peer.on('close', function() {
+      peer.on('close', function () {
         $log.debug('peer: main peer connection closed')
       })
 
-      peer.on('error', function(err) {
+      peer.on('error', function (err) {
         if (err.type === 'network') {
           // prevent redundant reconnect operations
           if (attempting_to_reconnect) {
@@ -75,7 +75,7 @@ o888o
 
           var attempt = 0
 
-          var itvl = $interval(function() {
+          var itvl = $interval(function () {
             if (attempt >= 20) {
               $log.debug('peer: giving up on reconnecting')
               $interval.cancel(itvl)
@@ -87,7 +87,7 @@ o888o
             peer.reconnect()
           }, 1000)
 
-          peer.once('open', function() {
+          peer.once('open', function () {
             attempting_to_reconnect = false
             $rootScope.disconnected = false
 
@@ -116,11 +116,11 @@ o888o
         return new ApplicationError(err.type, fatal_ref[err.type] || false)
       })
 
-      peer.on('connection', function() {
+      peer.on('connection', function () {
         $log.debug('peer: incoming connection')
       })
 
-      peer.on('call', function() {
+      peer.on('call', function () {
         $log.debug('peer: incoming call')
       })
 
@@ -139,21 +139,21 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
  */
 
   .service('_socket', ['$log', 'main_host', 'ApplicationError',
-    function($log, main_host, ApplicationError) {
+    function ($log, main_host, ApplicationError) {
       var socket = io.connect('https://' + main_host, {
         path: '/coordinator'
       })
 
-      socket.on('error', function(err) {
+      socket.on('error', function (err) {
         console.error('socket-io-error', err)
         return new ApplicationError('socket-io-error', true)
       })
 
-      socket.on('disconnect', function() {
+      socket.on('disconnect', function () {
         $log.debug('[_socket] - disconnected!')
       })
 
-      socket.on('reconnect', function() {
+      socket.on('reconnect', function () {
         $log.debug('[_socket] - reconnected!')
       })
 
@@ -172,28 +172,28 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
 */
 
   .factory('coordinator', ['$log', '_socket', 'ApplicationError', 'peer', '$rootScope', '$q', '$timeout',
-    function($log, _socket, ApplicationError, peer, $rootScope, $q, $timeout) {
+    function ($log, _socket, ApplicationError, peer, $rootScope, $q, $timeout) {
       var is_ready_state = false
 
       var exports = new EventEmitter()
 
-      _socket.on('peer_left', function(id) {
+      _socket.on('peer_left', function (id) {
         exports.emit('peer_left', id)
       })
 
-      _socket.on('disconnect', function() {
+      _socket.on('disconnect', function () {
         is_ready_state = false
       })
 
-      _socket.on('reconnect', function() {
-        var back_online = function() {
+      _socket.on('reconnect', function () {
+        var back_online = function () {
           $log.debug('coordinator: everything back online')
           is_ready_state = true
         }
 
         // if peer is still disconnected, wait for reconnect
         if (peer.disconnected) {
-          var dereg = $rootScope.$on('peer:reconnect', function() {
+          var dereg = $rootScope.$on('peer:reconnect', function () {
             dereg()
             advertise_peer_id(back_online)
           })
@@ -210,7 +210,7 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
       function advertise_peer_id (callback) {
         $log.debug('coordinator: advertising peer_id to coordinator...')
 
-        var cb = function(err) {
+        var cb = function (err) {
           if (err)
             return new ApplicationError(err, true)
 
@@ -223,16 +223,16 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
         if (_socket.connected) {
           _socket.emit('peer_id', peer.id, cb)
         } else {
-          _socket.once('connect', function() {
+          _socket.once('connect', function () {
             _socket.emit('peer_id', peer.id, cb)
           })
         }
       }
 
       function join_room (room_id) {
-        return $q(function(resolve, reject) {
+        return $q(function (resolve, reject) {
           if (is_ready_state) {
-            _socket.emit('join_room', room_id, function(err, roomies) {
+            _socket.emit('join_room', room_id, function (err, roomies) {
               if (err) return reject(err)
               $log.debug('coordinator: joined room (%s)', room_id)
 
@@ -255,14 +255,14 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
       }
 
       function promiseUntilReady () {
-        return $q(function(resolve, reject) {
+        return $q(function (resolve, reject) {
           if (is_ready_state) {
             resolve()
           } else {
             exports.once('ready', resolve)
           }
 
-          $timeout(function() {
+          $timeout(function () {
             exports.removeListeners('ready', resolve)
             reject('timed-out')
           }, 5000)
@@ -293,9 +293,9 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
  */
 
   .factory('PeerWrapper', ['$log', 'peer', 'GumService', '$random', '$interval', '$timeout',
-    function($log, peer, GumService, $random, $interval, $timeout) {
+    function ($log, peer, GumService, $random, $interval, $timeout) {
       var senders = {
-        'event': function() {
+        'event': function () {
           // lets send an event to a remote peer
 
           var msg = {}
@@ -321,7 +321,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
           // happy trails event!
           this.dc.send(msg)
         },
-        message: function(content) {
+        message: function (content) {
           var msg = {}
           msg.type = 'message'
           msg.content = content
@@ -348,19 +348,19 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         this.ms = null // mediastream goes here
 
         // MediaConnection handlers
-        this.mc.on('stream', function(stream) {
+        this.mc.on('stream', function (stream) {
           $log.debug("peer-mc(%s) 'stream' event", self.id)
           self.ms = stream
           self.emit('stream', stream)
         })
 
-        this.mc.on('error', function(err) {
+        this.mc.on('error', function (err) {
           $log.error('peer-mc(%s) error: ', self.id, err)
           self.emit('error-mc', err)
         })
 
         // DataConnection handlers
-        this.dc.on('data', function(data) {
+        this.dc.on('data', function (data) {
           accumulated_dc_errors = 0
 
           if (typeof data === 'object') {
@@ -368,7 +368,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
               // if there is a callback_id create a callback function
               // that will acknowledge
               if (data.cb_id) {
-                var cb = function() {
+                var cb = function () {
                   // all pretty self-explanatory
                   var msg = {
                     type: 'cb',
@@ -413,17 +413,17 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
           self.emit('data', data)
         })
 
-        this.dc.on('open', function() {
+        this.dc.on('open', function () {
           $log.debug('peer-dc(%s) open', self.id)
           self.emit('open')
         })
 
-        this.dc.on('close', function() {
+        this.dc.on('close', function () {
           $log.debug('peer-dc(%s) close', self.id)
           self.emit('close', self.id)
         })
 
-        this.dc.on('error', function(err) {
+        this.dc.on('error', function (err) {
           accumulated_dc_errors += 1
           $log.error('peer-dc(%s)', self.id)
           self.emit('error-dc', err)
@@ -435,7 +435,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
       }
       PeerWrapper.prototype = _.clone(EventEmitter.prototype)
 
-      PeerWrapper.forgeFromConnections = function(dc, mc) {
+      PeerWrapper.forgeFromConnections = function (dc, mc) {
         // this will be used to create a PeerWrapper from just the
         // incoming connections
 
@@ -446,7 +446,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         return new PeerWrapper(dc.peer, dc, mc)
       }
 
-      PeerWrapper.prototype.send = function() {
+      PeerWrapper.prototype.send = function () {
         var self = this
         var args = Array.prototype.slice.call(arguments)
 
@@ -463,7 +463,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         }
       }
 
-      PeerWrapper.prototype.close = _.once(function() {
+      PeerWrapper.prototype.close = _.once(function () {
         var self = this
 
         // log for science
@@ -478,7 +478,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
         // give everyone time to receive the 'close' event
         // then detach all listeners
-        $timeout(function() {
+        $timeout(function () {
           self.removeAllListeners()
           self.dc.removeAllListeners()
           self.mc.removeAllListeners()
@@ -500,7 +500,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
  */
 
   .service('GumService', ['$log', '$rootScope', 'ApplicationError', '$q',
-    function($log, $rootScope, ApplicationError, $q) {
+    function ($log, $rootScope, ApplicationError, $q) {
       var ms = null
       var isInvoked = false
 
@@ -508,20 +508,20 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         if (!_.isFunction(getUserMedia))
           return $q.reject('browser-incompatible')
 
-        return $q(function(resolve, reject) {
+        return $q(function (resolve, reject) {
           if (!!ms && isInvoked)
             return resolve(ms)
 
           getUserMedia({
             video: true,
             audio: true
-          }, function(stream) {
+          }, function (stream) {
             $rootScope.$broadcast('gum:invoke', stream)
 
             ms = stream
             isInvoked = true
             resolve(ms)
-          }, function() {
+          }, function () {
             $rootScope.$broadcast('gum:error', 'no-webcam')
 
             // the error from this isn't very descriptive
@@ -549,7 +549,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
   ])
 
   .service('$random', ['$log',
-    function($log) {
+    function ($log) {
       function rand_string (length) {
         length = length || 15
         var out = []

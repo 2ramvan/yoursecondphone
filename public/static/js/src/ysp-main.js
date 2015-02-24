@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
   'use strict'
 
   /*
@@ -25,13 +25,13 @@
   .value('fullscreen', screenfull)
 
   .config(['$logProvider',
-    function($logProvider) {
+    function ($logProvider) {
       $logProvider.debugEnabled((!!sessionStorage) && sessionStorage.debug === 'true')
     }
   ])
 
   .config(['$routeProvider',
-    function($routeProvider) {
+    function ($routeProvider) {
       $routeProvider.when('/', {
         controller: 'RootCtrl',
         templateUrl: '/static/views/root.html'
@@ -54,11 +54,11 @@
   ])
 
   .run(['$log', 'peer', 'coordinator', 'ApplicationError', '$interval', '$rootScope',
-    function($log, peer, coordinator, ApplicationError, $interval, $rootScope) {
+    function ($log, peer, coordinator, ApplicationError, $interval, $rootScope) {
       if (peer.open) {
         coordinator.advertise_peer_id()
       } else {
-        peer.once('open', function(id) {
+        peer.once('open', function (id) {
           coordinator.advertise_peer_id()
         })
       }
@@ -74,7 +74,7 @@
   ])
 
   .factory('ApplicationError', ['$log', '$location', '$rootScope', '$timeout',
-    function($log, $location, $rootScope, $timeout) {
+    function ($log, $location, $rootScope, $timeout) {
       function ApplicationError (type, panic) {
         if (!this instanceof ApplicationError) return new ApplicationError(type, panic)
 
