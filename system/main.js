@@ -32,7 +32,7 @@ app.use(function redirectToSecure (req, res, next) {
   if (req.secure)
     next()
   else
-    res.redirect(301, 'https://yoursecondphone.co')
+    res.redirect(301, 'https://' + config.hostname + '/')
 })
 
 app.locals = {
