@@ -20,7 +20,7 @@
 
   .constant('main_host', 'yoursecondphone.co')
 
-  .constant('peer_server_port', parseInt(window.location.port, 10))
+  .constant('peer_server_port', parseInt(window.location.port, 10) || 443)
 
   .value('fullscreen', screenfull)
 
