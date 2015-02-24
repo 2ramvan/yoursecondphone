@@ -17,7 +17,7 @@ function RoomAbstract (room_id, first_peer) {
     this.addPeer(first_peer)
   }
 }
-RoomAbstract.prototype.addPeer = function(peer_id) {
+RoomAbstract.prototype.addPeer = function (peer_id) {
   if (this.peers.length < 3) {
     if (this.peers.indexOf(peer_id) < 0)
       this.peers.push(peer_id)
@@ -25,7 +25,7 @@ RoomAbstract.prototype.addPeer = function(peer_id) {
     throw new Error('room-full')
   }
 }
-RoomAbstract.prototype.removePeer = function(peer_id) {
+RoomAbstract.prototype.removePeer = function (peer_id) {
   var idx = _.indexOf(this.peers, peer_id)
   if (idx >= 0) {
     this.peers.splice(idx, 1)
@@ -33,12 +33,12 @@ RoomAbstract.prototype.removePeer = function(peer_id) {
   } else
     return false
 }
-RoomAbstract.prototype.getPeers = function(exclude) {
+RoomAbstract.prototype.getPeers = function (exclude) {
   return _.without(this.peers, exclude)
 }
 RoomAbstract.prototype.getOtherPeers = RoomAbstract.prototype.getPeers
 
-RoomAbstract.prototype.isEmpty = function() {
+RoomAbstract.prototype.isEmpty = function () {
   return !this.peers.length
 }
 

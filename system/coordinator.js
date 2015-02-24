@@ -13,8 +13,8 @@ var rooms = require('lru-cache')({
 })
 
 function register_coordinator (io) {
-  io.on('connection', function(socket) {
-    socket.on('room_exists', function(room_id, ack) {
+  io.on('connection', function (socket) {
+    socket.on('room_exists', function (room_id, ack) {
       debug('room_exists(\'%s\')', room_id)
 
       return ack(rooms.has(room_id))
@@ -73,11 +73,11 @@ function register_coordinator (io) {
           if (room.isEmpty()) {
             rooms.del(room_id)
           } else {
-            var audience = _.map(room.getPeers(), function(peer_id) {
+            var audience = _.map(room.getPeers(), function (peer_id) {
               return sockets[peer_id]
             })
 
-            _.forEach(audience, function(socket_id) {
+            _.forEach(audience, function (socket_id) {
               if (socket_id)
                 io.to(socket_id).emit('peer_left', pid)
             })
@@ -86,7 +86,7 @@ function register_coordinator (io) {
       }
     })
 
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function () {
       socket.removeAllListeners()
 
       // if no `peer_id` was found, then this was just a visitor
@@ -102,17 +102,17 @@ function register_coordinator (io) {
 
       var disc_peer_id = socket.peer_id
 
-      rooms.forEach(function(room, room_id, rooms) {
+      rooms.forEach(function (room, room_id, rooms) {
         if (room.removePeer(disc_peer_id)) {
           if (room.isEmpty()) {
             rooms.del(room_id)
           } else {
             // broadcast
-            var audience = _.map(room.getPeers(), function(peer_id) {
+            var audience = _.map(room.getPeers(), function (peer_id) {
               return sockets[peer_id]
             })
 
-            _.forEach(audience, function(socket_id) {
+            _.forEach(audience, function (socket_id) {
               if (socket_id)
                 io.to(socket_id).emit('peer_left', disc_peer_id)
             })

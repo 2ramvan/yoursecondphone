@@ -2,11 +2,11 @@
 
 var basic = {}
 
-basic.render = function(view_name, status_code) {
+basic.render = function (view_name, status_code) {
   if (!status_code)
     status_code = 200
 
-  return function(req, res) {
+  return function (req, res) {
     res.status(status_code)
     res.render(view_name, {
       page_id: view_name
@@ -14,7 +14,7 @@ basic.render = function(view_name, status_code) {
   }
 }
 
-basic.index = function(req, res) {
+basic.index = function (req, res) {
   res.locals.page_id = 'main'
   res.locals.skipIntro = false
   res.locals.show_ad = true
@@ -27,7 +27,7 @@ basic.index = function(req, res) {
   })
 }
 
-basic.server_error = function(err, req, res, next) {
+basic.server_error = function (err, req, res, next) {
   console.error('ERROR: %s - %s', new Date(), err.hasOwnProperty('stack') ? err.stack : err)
 
   res.status(500)

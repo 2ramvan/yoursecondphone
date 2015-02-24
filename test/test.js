@@ -12,13 +12,13 @@ global beforeEach
 global afterEach
  */
 
-describe('RoomAbstract', function() {
+describe('RoomAbstract', function () {
   var RoomAbstract = require('../system/RoomAbstract')
 
-  describe('constructor', function() {
+  describe('constructor', function () {
     var room
 
-    it('should return a RoomAbstract instance when given a valid room id', function() {
+    it('should return a RoomAbstract instance when given a valid room id', function () {
       room = new RoomAbstract('i-am-a-room')
 
       assert.equal(room.id, 'i-am-a-room', 'passed in room_id is not the one set on the `id` property')
@@ -26,7 +26,7 @@ describe('RoomAbstract', function() {
       assert.equal(room.peers.length, 0, 'room.peers has something in it')
     })
 
-    it('should throw an error when given an invalid `room_id`', function() {
+    it('should throw an error when given an invalid `room_id`', function () {
       var err
 
       try {
@@ -40,8 +40,8 @@ describe('RoomAbstract', function() {
     })
   })
 
-  describe('#addPeer', function() {
-    it('should add the specified peer if the room is not full (it is not) and is not already present (is not)', function() {
+  describe('#addPeer', function () {
+    it('should add the specified peer if the room is not full (it is not) and is not already present (is not)', function () {
       var binder = {
         peers: ['peer1']
       }
@@ -52,7 +52,7 @@ describe('RoomAbstract', function() {
       assert.ok(_.contains(binder.peers, 'peer2'), '`peer2` was not found in the array')
     })
 
-    it('should not add the peer and should throw an error if the room is full', function() {
+    it('should not add the peer and should throw an error if the room is full', function () {
       var err
 
       var binder = {
@@ -71,7 +71,7 @@ describe('RoomAbstract', function() {
       assert.ok(!_.contains(binder.peers, 'peer4'), '`peer4` made it into the peers array')
     })
 
-    it('should not add the specified peer if it is already present', function() {
+    it('should not add the specified peer if it is already present', function () {
       var binder = {
         peers: ['peer1', 'peer2']
       }
@@ -82,8 +82,8 @@ describe('RoomAbstract', function() {
     })
   })
 
-  describe('#removePeer', function() {
-    it('should remove the specified peer and return a boolean indicating whether or not the array was changed', function() {
+  describe('#removePeer', function () {
+    it('should remove the specified peer and return a boolean indicating whether or not the array was changed', function () {
       var binder = {
         peers: ['peer1', 'peer2']
       }
@@ -95,7 +95,7 @@ describe('RoomAbstract', function() {
       assert.ok(changed, 'the returned value incorrectly reflects the change')
     })
 
-    it('should not remove the specified peer (because it was not there to remove) and return a boolean indicating no change', function() {
+    it('should not remove the specified peer (because it was not there to remove) and return a boolean indicating no change', function () {
       var binder = {
         peers: ['peer1', 'peer2']
       }
@@ -108,8 +108,8 @@ describe('RoomAbstract', function() {
     })
   })
 
-  describe('#getPeers', function() {
-    it('should return an array of peers without the specified peer', function() {
+  describe('#getPeers', function () {
+    it('should return an array of peers without the specified peer', function () {
       var binder = {
         peers: ['peer1', 'peer2', 'peer3']
       }
@@ -119,7 +119,7 @@ describe('RoomAbstract', function() {
       assert.deepEqual(otherPeers, ['peer1', 'peer3'], 'did not get back the expected array')
     })
 
-    it('should just return all peers if the specified peer is not in the array', function() {
+    it('should just return all peers if the specified peer is not in the array', function () {
       var binder = {
         peers: ['joe', 'bob', 'mike']
       }
@@ -130,8 +130,8 @@ describe('RoomAbstract', function() {
     })
   })
 
-  describe('#isEmpty', function() {
-    it('should return `true` if the peers array is empty', function() {
+  describe('#isEmpty', function () {
+    it('should return `true` if the peers array is empty', function () {
       var binder = {
         peers: []
       }
@@ -141,7 +141,7 @@ describe('RoomAbstract', function() {
       assert.ok(empty, 'wrong value returned, was expecting `true`')
     })
 
-    it('should return `false` if there are peers in the room', function() {
+    it('should return `false` if there are peers in the room', function () {
       var empty = RoomAbstract.prototype.isEmpty.call({
         peers: ['peer1']
       })
@@ -151,9 +151,9 @@ describe('RoomAbstract', function() {
   })
 })
 
-describe('coordinator', function() {
+describe('coordinator', function () {
   // this is a stub of a socket.io instance
-  var emulate_socket_io = function(num_dummies, callback) {
+  var emulate_socket_io = function (num_dummies, callback) {
     // make `num_dummies` and optional param, defaulting to 1
     if (_.isFunction(num_dummies)) {
       callback = num_dummies
@@ -178,7 +178,7 @@ describe('coordinator', function() {
     // here is where it gets interesting
     return {
       // create a stub for registering an event
-      on: function(e, h) {
+      on: function (e, h) {
         // just keep an eye out for `connection` thats all we care about
         if (e === 'connection') {
           // push the dummies into the connection events handler
@@ -190,23 +190,23 @@ describe('coordinator', function() {
         }
       },
       // emulate room broadcasts
-      to: function(room) {
+      to: function (room) {
         return _.find(dummies, { id: room })
       }
     }
   }
 
-  describe('room_exists', function() {
+  describe('room_exists', function () {
     var dummy_socket
 
-    beforeEach(function(done) {
-      coordinator(emulate_socket_io(function(dummies) {
+    beforeEach(function (done) {
+      coordinator(emulate_socket_io(function (dummies) {
         var a = dummies[0]
 
         async.series([
           _.bind(a.emit, a, 'peer_id', 'peer1'),
           _.bind(a.emit, a, 'join_room', 'this-room-exists')
-        ], function(err) {
+        ], function (err) {
           if (err) throw err
 
           dummy_socket = a
@@ -216,27 +216,27 @@ describe('coordinator', function() {
       }))
     })
 
-    it('should acknowledge with a boolean of true, because the room does exist', function(done) {
-      dummy_socket.emit('room_exists', 'this-room-exists', function(exists) {
+    it('should acknowledge with a boolean of true, because the room does exist', function (done) {
+      dummy_socket.emit('room_exists', 'this-room-exists', function (exists) {
         assert.ok(exists, 'got `false`, was expecting `true`')
 
         done()
       })
     })
 
-    it('should acknowledge with a boolean of false, because the room does not exist', function(done) {
-      dummy_socket.emit('room_exists', 'i-dont-exist', function(exists) {
+    it('should acknowledge with a boolean of false, because the room does not exist', function (done) {
+      dummy_socket.emit('room_exists', 'i-dont-exist', function (exists) {
         assert.ok(!exists, 'got `true`, was expecting `false`')
         done()
       })
     })
   })
 
-  describe('peer_id', function() {
+  describe('peer_id', function () {
     var dummy_socket, a, b
 
-    beforeEach(function(done) {
-      coordinator(emulate_socket_io(3, function(dummies) {
+    beforeEach(function (done) {
+      coordinator(emulate_socket_io(3, function (dummies) {
         dummy_socket = dummies[0]
         a = dummies[1]
         a.connected = false
@@ -246,7 +246,7 @@ describe('coordinator', function() {
         async.series([
           _.bind(a.emit, a, 'peer_id', 'peer1'),
           _.bind(b.emit, b, 'peer_id', 'peer2')
-        ], function(err) {
+        ], function (err) {
           if (err) throw new Error(err)
 
           done()
@@ -254,30 +254,30 @@ describe('coordinator', function() {
       }))
     })
 
-    afterEach(function() {
+    afterEach(function () {
       dummy_socket.emit('disconnect')
       a.emit('disconnect')
       b.emit('disconnect')
     })
 
-    it('should accept a valid peer_id and return no error', function(done) {
-      dummy_socket.emit('peer_id', 'peer3', function(err) {
+    it('should accept a valid peer_id and return no error', function (done) {
+      dummy_socket.emit('peer_id', 'peer3', function (err) {
         assert.ok(!err, 'got an unexpected error')
         assert.equal(dummy_socket.peer_id, 'peer3', 'peer_id property not set on the socket')
         done()
       })
     })
 
-    it('should reject an invalid peer_id', function(done) {
-      dummy_socket.emit('peer_id', 'i-@m-inval!d', function(err) {
+    it('should reject an invalid peer_id', function (done) {
+      dummy_socket.emit('peer_id', 'i-@m-inval!d', function (err) {
         assert.ok(!!err, 'did not get that error')
         assert.equal(err, 'invalid-peer-id', 'got an unexpected error code')
         done()
       })
     })
 
-    it('should reject when no peer_id is passed in', function(done) {
-      dummy_socket.emit('peer_id', null, function(err) {
+    it('should reject when no peer_id is passed in', function (done) {
+      dummy_socket.emit('peer_id', null, function (err) {
         assert.ok(!!err, 'did not get that error')
         assert.equal(err, 'invalid-peer-id', 'got an unexpected error code')
         done()
@@ -285,14 +285,14 @@ describe('coordinator', function() {
     })
   })
 
-  describe('join_room', function() {
+  describe('join_room', function () {
     var dummy_socket
     var a
     var b
     var c
 
-    beforeEach(function(done) {
-      coordinator(emulate_socket_io(4, function(dummies) {
+    beforeEach(function (done) {
+      coordinator(emulate_socket_io(4, function (dummies) {
         dummy_socket = dummies[0]
         a = dummies[1]
         b = dummies[2]
@@ -306,7 +306,7 @@ describe('coordinator', function() {
           ]),
           _.bind(a.emit, a, 'join_room', 'this-room-is-lovely'),
           _.bind(b.emit, b, 'join_room', 'this-room-is-lovely')
-        ], function(err) {
+        ], function (err) {
           if (err) throw new Error(err)
 
           done()
@@ -314,27 +314,27 @@ describe('coordinator', function() {
       }))
     })
 
-    afterEach(function() {
+    afterEach(function () {
       dummy_socket.emit('disconnect')
       a.emit('disconnect')
       b.emit('disconnect')
       c.emit('disconnect')
     })
 
-    it("should let the peer create a validly id'd room and return an empty array", function(done) {
-      dummy_socket.emit('join_room', 'another-room', function(err, peers) {
+    it("should let the peer create a validly id'd room and return an empty array", function (done) {
+      dummy_socket.emit('join_room', 'another-room', function (err, peers) {
         assert.ok(!err, 'got an unexpected error')
         assert.deepEqual(peers, [], 'did not get an empty array')
 
-        dummy_socket.emit('room_exists', 'another-room', function(exists) {
+        dummy_socket.emit('room_exists', 'another-room', function (exists) {
           assert.ok(exists, 'coordinator claims the newly created room does not exist')
           done()
         })
       })
     })
 
-    it('should reject if the room_id is not valid', function(done) {
-      dummy_socket.emit('join_room', 'i-@m-not-val!d', function(err, peers) {
+    it('should reject if the room_id is not valid', function (done) {
+      dummy_socket.emit('join_room', 'i-@m-not-val!d', function (err, peers) {
         assert.ok(err, 'did not get that error')
         assert.equal(err, 'invalid-room-id')
         assert.ok(!peers, 'something other than an error was returned')
@@ -343,16 +343,16 @@ describe('coordinator', function() {
       })
     })
 
-    it('should not let the peer create a room if it has not established its peer_id', function(done) {
-      c.emit('join_room', 'i-am-valid', function(err) {
+    it('should not let the peer create a room if it has not established its peer_id', function (done) {
+      c.emit('join_room', 'i-am-valid', function (err) {
         assert.ok(err, 'did not get that error')
         assert.equal(err, 'no-peer-id', 'got an unexpected error code')
         done()
       })
     })
 
-    it('should return the other peers in the room upon joining an occupied room', function(done) {
-      dummy_socket.emit('join_room', 'this-room-is-lovely', function(err, peers) {
+    it('should return the other peers in the room upon joining an occupied room', function (done) {
+      dummy_socket.emit('join_room', 'this-room-is-lovely', function (err, peers) {
         peers.sort() // sort the peers
 
         assert.ok(!err, 'got an unexpected error')
@@ -361,18 +361,18 @@ describe('coordinator', function() {
       })
     })
 
-    it('should not let the peer join a room if it is full (3 peers is full)', function(done) {
+    it('should not let the peer join a room if it is full (3 peers is full)', function (done) {
       async.series([
-        function(cb) {
+        function (cb) {
           c.emit('peer_id', 'peer3', cb)
         },
-        function(cb) {
+        function (cb) {
           c.emit('join_room', 'this-room-is-lovely', cb)
         }
-      ], function(err) {
+      ], function (err) {
         if (err) throw new Error(err)
 
-        dummy_socket.emit('join_room', 'this-room-is-lovely', function(err, peers) {
+        dummy_socket.emit('join_room', 'this-room-is-lovely', function (err, peers) {
           assert.ok(err, 'did not get that error')
           assert.equal(err, 'room-full', 'got an unexpected error code')
           done()
@@ -381,59 +381,7 @@ describe('coordinator', function() {
     })
   })
 
-  describe('leave_room', function() {
-    var dummy_socket
-    var a
-    var b
-
-    beforeEach(function(done) {
-      coordinator(emulate_socket_io(3, function(dummies) {
-        dummy_socket = dummies[0]
-        a = dummies[1]
-        b = dummies[2]
-
-        async.series([
-          _.bind(async.parallel, async, [
-            _.bind(dummy_socket.emit, dummy_socket, 'peer_id', 'peer0'),
-            _.bind(a.emit, a, 'peer_id', 'peer1')
-          ]),
-          _.bind(dummy_socket.emit, dummy_socket, 'join_room', 'this-room-is-lovely'),
-          _.bind(a.emit, a, 'join_room', 'this-room-is-lovely')
-        ], function(err) {
-          if (err) throw new Error(err)
-
-          done()
-        })
-      }))
-    })
-
-    afterEach(function() {
-      dummy_socket.emit('disconnect')
-      a.emit('disconnect')
-    })
-
-    it('should remove emitting peer from the room and notify other peers', function(done) {
-      a.once('peer_left', function(peer_that_left) {
-        assert.equal(peer_that_left, 'peer0', 'got the wrong leaving peer')
-        done()
-      })
-      dummy_socket.emit('leave_room', 'this-room-is-lovely')
-    })
-
-    it('should remove the emitting peer and delete the room, because it is empty', function(done) {
-      a.emit('leave_room', 'this-room-is-lovely')
-      dummy_socket.emit('leave_room', 'this-room-is-lovely')
-
-      setTimeout(function() {
-        b.emit('room_exists', 'this-room-is-lovely', function(exists) {
-          assert.ok(!exists, 'the empty room still exists')
-          done()
-        })
-      }, 15)
-    })
-  })
-
-  describe('disconnect', function() {
+  describe('leave_room', function () {
     var dummy_socket
     var a
     var b
@@ -451,7 +399,7 @@ describe('coordinator', function() {
           ]),
           _.bind(dummy_socket.emit, dummy_socket, 'join_room', 'this-room-is-lovely'),
           _.bind(a.emit, a, 'join_room', 'this-room-is-lovely')
-        ], function(err) {
+        ], function (err) {
           if (err) throw new Error(err)
 
           done()
@@ -459,27 +407,79 @@ describe('coordinator', function() {
       }))
     })
 
-    afterEach(function() {
+    afterEach(function () {
+      dummy_socket.emit('disconnect')
+      a.emit('disconnect')
+    })
+
+    it('should remove emitting peer from the room and notify other peers', function (done) {
+      a.once('peer_left', function (peer_that_left) {
+        assert.equal(peer_that_left, 'peer0', 'got the wrong leaving peer')
+        done()
+      })
+      dummy_socket.emit('leave_room', 'this-room-is-lovely')
+    })
+
+    it('should remove the emitting peer and delete the room, because it is empty', function (done) {
+      a.emit('leave_room', 'this-room-is-lovely')
+      dummy_socket.emit('leave_room', 'this-room-is-lovely')
+
+      setTimeout(function () {
+        b.emit('room_exists', 'this-room-is-lovely', function (exists) {
+          assert.ok(!exists, 'the empty room still exists')
+          done()
+        })
+      }, 15)
+    })
+  })
+
+  describe('disconnect', function () {
+    var dummy_socket
+    var a
+    var b
+
+    beforeEach(function (done) {
+      coordinator(emulate_socket_io(3, function (dummies) {
+        dummy_socket = dummies[0]
+        a = dummies[1]
+        b = dummies[2]
+
+        async.series([
+          _.bind(async.parallel, async, [
+            _.bind(dummy_socket.emit, dummy_socket, 'peer_id', 'peer0'),
+            _.bind(a.emit, a, 'peer_id', 'peer1')
+          ]),
+          _.bind(dummy_socket.emit, dummy_socket, 'join_room', 'this-room-is-lovely'),
+          _.bind(a.emit, a, 'join_room', 'this-room-is-lovely')
+        ], function (err) {
+          if (err) throw new Error(err)
+
+          done()
+        })
+      }))
+    })
+
+    afterEach(function () {
       if (dummy_socket)
         dummy_socket.emit('disconnect')
       a.emit('disconnect')
       b.emit('disconnect')
     })
 
-    it('should tell others in the related room that a peer has left', function(done) {
-      a.once('peer_left', function(peer_that_left) {
+    it('should tell others in the related room that a peer has left', function (done) {
+      a.once('peer_left', function (peer_that_left) {
         assert.equal(peer_that_left, 'peer0', 'did not get the right value for `peer_that_left`')
         done()
       })
       dummy_socket.emit('disconnect')
     })
 
-    it('should destroy the room when all peers have disconnected', function(done) {
+    it('should destroy the room when all peers have disconnected', function (done) {
       a.emit('disconnect')
       dummy_socket.emit('disconnect')
 
-      setTimeout(function() {
-        b.emit('room_exists', 'this-room-is-lovely', function(exists) {
+      setTimeout(function () {
+        b.emit('room_exists', 'this-room-is-lovely', function (exists) {
           assert.ok(!exists, 'coordinator says the room still exists')
           done()
         })

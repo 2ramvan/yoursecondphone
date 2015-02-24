@@ -51,7 +51,7 @@ app.set('view engine', 'jade')
 app.use(timeout())
 
 // keep pingdom out of the logs
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   if ((/pingdom/i).test(req.get('user-agent')))
     return res.send(200)
 
@@ -72,10 +72,10 @@ app.use('/peers', expressPeerServer(server))
 app.use(logger('combined'))
 
 // Done with middleware - wire up routes
-app.get('/source', function(req, res) {
+app.get('/source', function (req, res) {
   res.redirect('https://github.com/yoursecondphone/yoursecondphone')
 })
-app.get('/issues', function(req, res) {
+app.get('/issues', function (req, res) {
   res.redirect('https://github.com/yoursecondphone/yoursecondphone/issues')
 })
 app.get('/about', basic.render('about'))
