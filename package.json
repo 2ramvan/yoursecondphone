@@ -22,15 +22,26 @@
     "spdy": "1.x"
   },
   "devDependencies": {
-    "grunt": "^0.4.4",
-    "grunt-contrib-less": "^0.11.4",
-    "grunt-contrib-uglify": "^0.4.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-less": "^1.0.0",
+    "grunt-contrib-uglify": "^0.8.0",
     "grunt-contrib-watch": "^0.6.1",
-    "mocha": "^1.20.1"
+    "mocha": "^2.1.0",
+    "standard": "^2.7.3"
   },
   "scripts": {
-    "test": "mocha --reporter spec",
-    "start": "node system/main.js"
+    "test": "standard && mocha --reporter spec",
+    "start": "node system/main.js",
+    "dev": "NODE_ENV=development PORT=8888 SSL_PORT=3000 nodemon system/main.js"
+  },
+  "standard": {
+    "ignore": [
+      "public/static/js/lib/**",
+      "public/static/js/build/**",
+      "public/static/js/ga.js",
+      "public/static/js/webrtc_adapter.js",
+      "public/static/js/webrtc_adapter.min.js"
+    ]
   },
   "repository": {
     "type": "git",
