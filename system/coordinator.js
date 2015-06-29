@@ -78,8 +78,9 @@ function register_coordinator (io) {
             })
 
             _.forEach(audience, function (socket_id) {
-              if (socket_id)
+              if (socket_id) {
                 io.to(socket_id).emit('peer_left', pid)
+              }
             })
           }
         }
@@ -113,8 +114,9 @@ function register_coordinator (io) {
             })
 
             _.forEach(audience, function (socket_id) {
-              if (socket_id)
+              if (socket_id) {
                 io.to(socket_id).emit('peer_left', disc_peer_id)
+              }
             })
           }
         }

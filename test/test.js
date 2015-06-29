@@ -182,8 +182,9 @@ describe('coordinator', function () {
         // just keep an eye out for `connection` thats all we care about
         if (e === 'connection') {
           // push the dummies into the connection events handler
-          for (var i = 0; i < num_dummies; i++)
+          for (var i = 0; i < num_dummies; i++) {
             h(dummies[i])
+          }
 
           // and give the test the array of dummies so it can set up a scenario
           callback(dummies)
@@ -460,8 +461,9 @@ describe('coordinator', function () {
     })
 
     afterEach(function () {
-      if (dummy_socket)
+      if (dummy_socket) {
         dummy_socket.emit('disconnect')
+      }
       a.emit('disconnect')
       b.emit('disconnect')
     })
