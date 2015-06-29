@@ -99,9 +99,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
         $scope.loading_room = true
         $log.debug('Launching room... %s', $scope.room_name)
 
-        if (!$scope.valid_room_name || $scope.room_name === '')
+        if (!$scope.valid_room_name || $scope.room_name === '') {
           $scope.room_name = $random.string(10)
-
+        }
         coordinator.room_exists($scope.room_name, function (exists) {
           $scope.loading_room = false
           if (exists) {
@@ -131,9 +131,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
   .controller('RoomCtrl', ['$q', '$timeout', '$log', '$scope', 'GumService', '$location', '$routeParams', 'coordinator', 'ApplicationError', 'PeerWrapper', 'peer', 'fullscreen', '$random', '$rootScope', 'supportsRealTimeCommunication',
     function ($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
-      if (!supportsRealTimeCommunication())
+      if (!supportsRealTimeCommunication()) {
         return new ApplicationError('browser-incompatible', true)
-
+      }
       $scope.room_id = $routeParams.room_id
       $scope.room_link = 'http://ysp.im/#/' + $routeParams.room_id
       $scope.peers = []

@@ -5,14 +5,16 @@
   global _
   global angular
   global screenfull
+  global sessionStorage
   */
 
   global.$debug = function enableDebug (setTo) {
-    if (_.isBoolean(setTo) && !!sessionStorage) {
+    if (_.isBoolean(setTo) && _.has(global, 'sessionStorage')) {
       sessionStorage.debug = setTo
 
-      if (global.location && _.isFunction(location.reload))
-        location.reload()
+      if (global.location && _.isFunction(global.location.reload)) {
+        global.location.reload()
+      }
     }
   }
 
@@ -78,9 +80,9 @@
       function ApplicationError (type, panic) {
         if (!this instanceof ApplicationError) return new ApplicationError(type, panic)
 
-        if (!panic)
+        if (!panic) {
           panic = false
-
+        }
         Error.apply(this, arguments)
         this.name = 'ApplicationError'
         this.type = type
@@ -98,9 +100,9 @@
         }
         $timeout(angular.noop)
       }
-      ApplicationError.prototype = Error.prototype
-      ApplicationError.prototype.constructor = ApplicationError
-
+      ApplicationError.prototype = _.create(Error.prototype, {
+        constructor: ApplicationError
+      })
       return ApplicationError
     }
   ])
