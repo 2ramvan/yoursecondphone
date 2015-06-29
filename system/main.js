@@ -29,10 +29,11 @@ app.use(helmet.hsts({
 app.use(helmet.hidePoweredBy())
 
 app.use(function redirectToSecure (req, res, next) {
-  if (req.secure)
+  if (req.secure) {
     next()
-  else
+  } else {
     res.redirect(301, 'https://' + config.hostname + '/')
+  }
 })
 
 app.locals = {
@@ -52,8 +53,9 @@ app.use(timeout())
 
 // keep pingdom out of the logs
 app.use(function (req, res, next) {
-  if ((/pingdom/i).test(req.get('user-agent')))
+  if ((/pingdom/i).test(req.get('user-agent'))) {
     return res.send(200)
+  }
 
   next()
 })

@@ -51,10 +51,11 @@ o888o
       peer.on('open', function (id) {
         $log.debug('peer: main peer connection open (%s)', id)
 
-        if (!is_reconnect)
+        if (!is_reconnect) {
           is_reconnect = true
-        else
+        } else {
           $rootScope.$broadcast('peer:reconnect')
+        }
       })
 
       peer.on('close', function () {
@@ -211,9 +212,9 @@ d88' `"Y8 d88' `88b d88' `88b `888""8P d88' `888  `888  `888P"Y88b  `P  )88b    
         $log.debug('coordinator: advertising peer_id to coordinator...')
 
         var cb = function (err) {
-          if (err)
+          if (err) {
             return new ApplicationError(err, true)
-
+          }
           $log.debug('coordinator: peer_id successfully advertised...')
           is_ready_state = true
           exports.emit('ready')
@@ -505,13 +506,13 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
       var isInvoked = false
 
       this.invoke = function gum_invoke () {
-        if (!_.isFunction(getUserMedia))
+        if (!_.isFunction(getUserMedia)) {
           return $q.reject('browser-incompatible')
-
+        }
         return $q(function (resolve, reject) {
-          if (!!ms && isInvoked)
+          if (!!ms && isInvoked) {
             return resolve(ms)
-
+          }
           getUserMedia({
             video: true,
             audio: true
@@ -533,9 +534,9 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
       }
 
       this.revoke = function gum_revoke () {
-        if (ms)
+        if (ms) {
           ms.stop()
-
+        }
         ms = null
         isInvoked = false
 
@@ -555,9 +556,9 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         var out = []
         var possible = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
-        for (var i = 0; i < length; i++)
+        for (var i = 0; i < length; i++) {
           out.push(possible.charAt(Math.round(Math.random() * possible.length)))
-
+        }
         return out.join('')
       }
 

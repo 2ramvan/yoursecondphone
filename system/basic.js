@@ -3,9 +3,9 @@
 var basic = {}
 
 basic.render = function (view_name, status_code) {
-  if (!status_code)
+  if (!status_code) {
     status_code = 200
-
+  }
   return function (req, res) {
     res.status(status_code)
     res.render(view_name, {
