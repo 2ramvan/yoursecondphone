@@ -295,43 +295,12 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
 
   .factory('PeerWrapper', ['$log', 'peer', 'GumService', '$random', '$interval', '$timeout',
     function ($log, peer, GumService, $random, $interval, $timeout) {
-      var senders = {
-        'event': function () {
-          // lets send an event to a remote peer
-
-          var msg = {}
-          var args = Array.prototype.slice.call(arguments)
-          msg.type = 'event' // yup, its and event
-          msg.event_name = args.shift() // pull off the event name
-
-          // if there is a function at the end of the arguments
-          if (typeof args[args.length - 1] === 'function') {
-            // pull it off
-            var callback = args.pop()
-
-            // give it an id
-            var cb_id = $random.string(20)
-
-            // store it for later
-            this.waiting_cbs[cb_id] = callback // this refers to the peerwrapper just to avoid confusion
-            msg.cb_id = cb_id // make sure the receiver knows the callback to call
-          }
-
-          msg.args = args
-
-          // happy trails event!
-          this.dc.send(msg)
-        },
-        message: function (content) {
-          var msg = {}
-          msg.type = 'message'
-          msg.content = content
-
-          this.dc.send(msg)
-        }
-      }
+      var COMM_TYPE_EVENT = 'event'
+      var COMM_TYPE_MESSAGE = 'msg'
+      var COMM_TYPE_CALLBACK = 'cb'
 
       function PeerWrapper (peer_id, dc, mc) {
+        EventEmitter.apply(this, [])
         var self = this
 
         // keep track of consecutive dc errors
@@ -364,54 +333,22 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         this.dc.on('data', function (data) {
           accumulated_dc_errors = 0
 
-          if (typeof data === 'object') {
-            if (data.type === 'event') {
-              // if there is a callback_id create a callback function
-              // that will acknowledge
-              if (data.cb_id) {
-                var cb = function () {
-                  // all pretty self-explanatory
-                  var msg = {
-                    type: 'cb',
-                    cb_id: data.cb_id
-                  }
-
-                  var args = Array.prototype.slice.call(arguments)
-                  msg.args = args
-
-                  self.dc.send(msg)
-                }
-              }
-
-              var args = data.args || []
-              args.push(cb || angular.noop) // push the callback to the end
-              args.unshift(data.event_name) // push the event name to the beginning
-
-              // emit that sucka!!
-              self.emit.apply(self, args)
-            }
-
-            // hooray! the callback has been acknowledged
-            if (data.type === 'cb') {
-              // call it and remove it from the queue
-              (self.waiting_cbs[data.cb_id] || angular.noop).apply(self, data.args)
-              delete self.waiting_cbs[data.cb_id]
-            }
-
-            // send this back, pronto!!
-            if (data.type === 'heartbeat') {
-              self.dc.send({
-                type: 'heartbeat_reply',
-                hb_id: data.hb_id
-              })
-            }
-
-            if (data.type === 'message') {
-              self.emit('message', data.content)
+          if (_.isObject(data)) {
+            switch (_.get(data, 'type')) {
+              case COMM_TYPE_EVENT:
+                this._receiveEvent(data)
+                break
+              case COMM_TYPE_CALLBACK:
+                this._receiveCallback(data)
+                break
+              case COMM_TYPE_MESSAGE:
+                this._receiveMessage(data)
+                break
+              default:
+                $log.error('unknown comm type (%s)', _.get(data, 'type'))
+                break;
             }
           }
-
-          self.emit('data', data)
         })
 
         this.dc.on('open', function () {
@@ -434,7 +371,9 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
           }
         })
       }
-      PeerWrapper.prototype = _.clone(EventEmitter.prototype)
+      PeerWrapper.prototype = _.create(EventEmitter.prototype, {
+        constructor: PeerWrapper
+      })
 
       PeerWrapper.forgeFromConnections = function (dc, mc) {
         // this will be used to create a PeerWrapper from just the
@@ -447,21 +386,80 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         return new PeerWrapper(dc.peer, dc, mc)
       }
 
+      function ucfirst (str) {
+        return str.charAt(0).toUpperCase() + str.substr(1)
+      }
+
       PeerWrapper.prototype.send = function () {
-        var self = this
-        var args = Array.prototype.slice.call(arguments)
+        var args = [].slice.call(arguments)
+        var sendType = args.shift()
+        var sendFn = '_send' + ucfirst(sendType)
+        return this[sendFn].apply(this, args)
+      }
 
-        // pull the send type off of the arguments
-        var send_type = args.shift()
-
-        // check if sender is valid
-        if (!senders[send_type]) {
-          // this is mostly an internal api, so misusing it is inexcusable
-          throw new Error('Invalid Sender!')
-        } else {
-          // call the sender
-          senders[send_type].apply(self, args)
+      /**
+       * Send an event to this peer
+       */
+      PeerWrapper.prototype._sendEvent = function () {
+        // lets send an event to a remote peer
+        var args = [].slice.call(arguments)
+        var msg = {
+          type: COMM_TYPE_EVENT,
+          event_name: args.shift()
         }
+
+        // if there is a function at the end of the arguments, store it and send
+        // a cb_id so this event can be acknowledged
+        if (_.isFunction(_.last(args))) {
+          msg.cb_id = $random.string(20)
+          this.waiting_cbs = args.pop()
+        }
+
+        msg.args = args
+
+        // happy trails event!
+        this.dc.send(msg)
+      }
+
+      /**
+       * Send a message to this peer
+       *
+       * @param  {string} content A message to send
+       * @return {void}
+       */
+      PeerWrapper.prototype._sendMessage = function (content) {
+        this.dc.send({
+          type: COMM_TYPE_MESSAGE,
+          content: content
+        })
+      }
+
+      PeerWrapper.prototype._receiveEvent = function (commData) {
+        var cb = angular.noop
+        // if there is a callback_id create a callback function that will
+        // acknowledge
+        if (_.has(commData, 'cb_id')) {
+          cb = function () {
+            this.dc.send({
+              type: COMM_TYPE_CALLBACK,
+              cb_id: commData.cb_id,
+              args: [].slice.call(arguments)
+            })
+          }
+        }
+        var args = _.get(commData, 'args', [])
+        args.push(cb)
+        args.unshift(commData.event_name)
+        this.emit.apply(this, args)
+      }
+
+      PeerWrapper.prototype._receiveCallback = function(commData) {
+        _.get(this.waiting_cbs, commData.cb_id, angular.noop).apply(this, _.get(commData, 'args', []))
+        delete this.waiting_cbs[commData.cb_id]
+      }
+
+      PeerWrapper.prototype._receiveMessage = function(commData) {
+        this.emit('message', commData.content)
       }
 
       PeerWrapper.prototype.close = _.once(function () {
