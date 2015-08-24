@@ -346,7 +346,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
                 break
               default:
                 $log.error('unknown comm type (%s)', _.get(data, 'type'))
-                break;
+                break
             }
           }
         })
@@ -453,12 +453,12 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
         this.emit.apply(this, args)
       }
 
-      PeerWrapper.prototype._receiveCallback = function(commData) {
+      PeerWrapper.prototype._receiveCallback = function (commData) {
         _.get(this.waiting_cbs, commData.cb_id, angular.noop).apply(this, _.get(commData, 'args', []))
         delete this.waiting_cbs[commData.cb_id]
       }
 
-      PeerWrapper.prototype._receiveMessage = function(commData) {
+      PeerWrapper.prototype._receiveMessage = function (commData) {
         this.emit('message', commData.content)
       }
 
