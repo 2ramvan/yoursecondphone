@@ -20,20 +20,19 @@ var app = express()
 const hostname = config.get('hostname')
 const secure_port = config.get('ports.secure')
 
-{
-  let fs = require('fs')
-  let ssl = {}
-  ssl.key = fs.readFileSync(config.get('ssl.key'))
-  ssl.cert = fs.readFileSync(config.get('ssl.cert'))
-  if (config.has('ssl.ca')) {
-    ssl.ca = config.get('ssl.ca').map(function (_p) {
-      return fs.readFileSync(_p)
-    })
-  }
-  ssl.ca = config.get('ssl.ca')
-  var server = spdy.createServer(ssl, app)
+var fs = require('fs')
+var ssl = {}
+ssl.key = fs.readFileSync(config.get('ssl.key'))
+ssl.cert = fs.readFileSync(config.get('ssl.cert'))
+if (config.has('ssl.ca')) {
+  ssl.ca = config.get('ssl.ca').map(function (_p) {
+    return fs.readFileSync(_p)
+  })
 }
-
+ssl.ca = config.get('ssl.ca')
+var server = spdy.createServer(ssl, app)
+fs = undefined
+ssl = undefined
 
 app.use(function startup (req, res, next) {
   if (/^\/(about|privacy|terms|donate)?$/.test(req.path)) {
