@@ -1,7 +1,7 @@
 {
   "name": "yoursecondphone",
-  "version": "0.0.0",
-  "description": "yoursecondphone ===============",
+  "version": "1.0.0",
+  "description": "yoursecondphone",
   "main": "index.js",
   "directories": {
     "test": "test"
