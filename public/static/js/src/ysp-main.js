@@ -72,7 +72,7 @@
 
         $interval(function () {
           $rootScope.navOnline = navigator.onLine
-        }, 50)
+        }, 500)
       }
     }
   ])

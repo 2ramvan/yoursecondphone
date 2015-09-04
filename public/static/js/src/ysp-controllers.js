@@ -52,68 +52,65 @@ ooooooooo.                           .     .oooooo.       .            oooo
 o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
 */
 
-  .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'supportsRealTimeCommunication', 'coordinator', 'ApplicationError', '$timeout',
-    function ($log, $scope, GumService, $random, $location, supportsRealTimeCommunication, coordinator, ApplicationError, $timeout) {
-      $scope.current_step = 0
+  .controller('RootCtrl', ['$log', '$scope', 'GumService', '$random', '$location', 'rtc_supported', 'coordinator', 'ApplicationError', '$timeout',
+    function ($log, $scope, GumService, $random, $location, rtc_supported, coordinator, ApplicationError, $timeout) {
+      var STEP_ERR = -1
+      var STEP_INIT_GUM = 1
+      var STEP_PICK_ROOM_NAME = 2
 
-      if (supportsRealTimeCommunication()) {
-        $scope.current_step = 1
-      } else {
-        $scope.current_step = -1
-      }
-
+      $scope.current_step = rtc_supported ? STEP_INIT_GUM : STEP_ERR
       $scope.error_message = ''
       $scope.room_name = ''
       $scope.valid_room_name = true
+      $scope.loading_gum = false
+      $scope.loading_room = false
 
       $scope.$watch('room_name', function (newVal, oldVal) {
         if (newVal === '') {
           $scope.valid_room_name = true
-          return
+        } else {
+          $scope.valid_room_name = (/^\w(\w|-){1,30}$/).test(newVal)
         }
-
-        $scope.valid_room_name = (/^\w(\w|-){1,30}$/).test(newVal)
       })
 
-      $scope.loading_gum = false
       $scope.initGum = function () {
         $scope.loading_gum = true
-
         GumService.invoke()
-
-        .then(function () {
-          $scope.current_step += 1
-          $timeout(angular.noop)
-        }, function () {
-          return new ApplicationError('no-webcam', true)
-        })
-
-        .finally(function () {
-          $scope.loading_gum = false
-        })
+          .then(function () {
+            $scope.current_step = STEP_PICK_ROOM_NAME
+          })
+          .catch(function () {
+            return new ApplicationError('no-webcam', true)
+          })
+          .finally(function () {
+            $scope.loading_gum = false;
+          })
       }
 
-      $scope.loading_room = false
-      $scope.error_message = ''
       $scope.launchRoom = function () {
+        if (!$scope.valid_room_name) {
+          return;
+        }
+
         $scope.loading_room = true
         $log.debug('Launching room... %s', $scope.room_name)
 
-        if (!$scope.valid_room_name || $scope.room_name === '') {
+        if ($scope.room_name === '') {
           $scope.room_name = $random.string(10)
         }
+
         coordinator.room_exists($scope.room_name, function (exists) {
-          $scope.loading_room = false
-          if (exists) {
-            $scope.error_message = 'Sorry, that room name is already taken.'
-            $timeout(angular.noop)
-            $timeout(function () {
-              $scope.error_message = ''
-            }, 5000)
-          } else {
-            $location.path('/' + $scope.room_name)
-            $timeout(angular.noop)
-          }
+          $scope.$apply(function () {
+            $scope.loading_room = false
+            if (exists) {
+              $scope.error_message = 'Sorry, that room name is not available.'
+              $timeout(function () {
+                $scope.error_message = ''
+              }, 5000)
+            } else {
+              $location.path('/' + $scope.room_name)
+            }
+          })
         })
       }
     }
