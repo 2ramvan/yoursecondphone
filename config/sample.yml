@@ -1,0 +1,10 @@
+ssl:
+  key: /path/to/ssl_key
+  cert: /path/to/ssl_crt
+  ca:
+    - /path/to/crt_1
+    - /path/to/crt_2
+ports:
+  secure: 443
+  unsecure: 80
+hostname: yoursecondphone.co

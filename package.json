@@ -13,11 +13,13 @@
   "dependencies": {
     "async": "0.9.x",
     "compression": "1.x",
+    "config": "^1.16.0",
     "connect-timeout": "1.x",
     "debug": "1.x",
     "express": "4.x",
     "helmet": "0.4.x",
     "jade": "1.x",
+    "js-yaml": "^3.4.0",
     "lodash": "2.x",
     "lru-cache": "2.x",
     "morgan": "1.x",
@@ -35,8 +37,8 @@
   },
   "scripts": {
     "test": "standard && mocha --reporter spec",
-    "start": "node system/main.js",
-    "dev": "NODE_ENV=development PORT=8888 SSL_PORT=3000 nodemon system/main.js"
+    "dev": "NODE_ENV=development nodemon system/main.js",
+    "prod": "NODE_ENV=production pm2 start system/main.js"
   },
   "standard": {
     "ignore": [

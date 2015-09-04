@@ -18,9 +18,8 @@ ssl
 *.key
 *.crt
 
-ysp_config.js
-boot.json
-system/room_backup.json
-
 public/static/js/build/ysp.js
 public/static/css/main.css
+config/*
+!config/sample.yml
+!config/README.md
