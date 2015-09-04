@@ -3,6 +3,7 @@
 process.title = 'your second phone'
 
 // third-party dependencies
+var config = require('config')
 var express = require('express')
 var compression = require('compression')
 var timeout = require('connect-timeout')
@@ -13,11 +14,25 @@ var helmet = require('helmet')
 var expressPeerServer = require('peer').ExpressPeerServer
 // internal dependencies
 var basic = require('./basic')
-var config = require('../ysp_config')
 var coordinator = require('./coordinator')
 
 var app = express()
-var server = spdy.createServer(config.ssl, app)
+const hostname = config.get('hostname')
+const secure_port = config.get('ports.secure')
+
+var fs = require('fs')
+var ssl = {}
+ssl.key = fs.readFileSync(config.get('ssl.key'))
+ssl.cert = fs.readFileSync(config.get('ssl.cert'))
+if (config.has('ssl.ca')) {
+  ssl.ca = config.get('ssl.ca').map(function (_p) {
+    return fs.readFileSync(_p)
+  })
+}
+ssl.ca = config.get('ssl.ca')
+var server = spdy.createServer(ssl, app)
+fs = undefined
+ssl = undefined
 
 app.use(function startup (req, res, next) {
   if (/^\/(about|privacy|terms|donate)?$/.test(req.path)) {
@@ -40,12 +55,11 @@ app.use(function redirectToSecure (req, res, next) {
   if (req.secure) {
     next()
   } else {
-    res.redirect(301, 'https://' + config.hostname + '/')
+    res.redirect(301, `https://${hostname}:${secure_port}/`)
   }
 })
 
 app.locals = {
-  show_ad: false,
   page_id: 'unknown',
   ga: true
 }
@@ -106,7 +120,7 @@ var io = sio(server, {
 coordinator(io)
 
 // listen and redirect on unsecured http
-require('http').createServer(app).listen(config.port)
+require('http').createServer(app).listen(config.get('ports.unsecure'))
 
 // listen on secure SPDY/3.1
-server.listen(config.ssl_port, '::')
+server.listen(config.get('ports.secure'), '::')
