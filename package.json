@@ -48,7 +48,7 @@
     "url": "https://github.com/yoursecondphone/yoursecondphone"
   },
   "author": "Nick Comer <nick@comer.io>",
-  "license": "Apache 2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/yoursecondphone/yoursecondphone/issues"
   },
