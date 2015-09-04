@@ -78,10 +78,9 @@
   .factory('ApplicationError', ['$log', '$location', '$rootScope', '$timeout',
     function ($log, $location, $rootScope, $timeout) {
       function ApplicationError (type, panic) {
-        if (!this instanceof ApplicationError) return new ApplicationError(type, panic)
-
-        if (!panic) {
-          panic = false
+        panic = _.isBoolean(panic) ? panic : false
+        if (_.has(Error, 'captureStackTrace')) {
+          Error.captureStackTrace(this, ApplicationError)
         }
         Error.apply(this, arguments)
         this.name = 'ApplicationError'
