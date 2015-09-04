@@ -129,9 +129,9 @@ ooooooooo.                                           .oooooo.       .           
 o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b    o888o
  */
 
-  .controller('RoomCtrl', ['$q', '$timeout', '$log', '$scope', 'GumService', '$location', '$routeParams', 'coordinator', 'ApplicationError', 'PeerWrapper', 'peer', 'fullscreen', '$random', '$rootScope', 'supportsRealTimeCommunication',
-    function ($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, supportsRealTimeCommunication) {
-      if (!supportsRealTimeCommunication()) {
+  .controller('RoomCtrl', ['$q', '$timeout', '$log', '$scope', 'GumService', '$location', '$routeParams', 'coordinator', 'ApplicationError', 'PeerWrapper', 'peer', 'fullscreen', '$random', '$rootScope', 'rtc_supported',
+    function ($q, $timeout, $log, $scope, GumService, $location, $routeParams, coordinator, ApplicationError, PeerWrapper, peer, fullscreen, $random, $rootScope, rtc_supported) {
+      if (!rtc_supported) {
         return new ApplicationError('browser-incompatible', true)
       }
       $scope.room_id = $routeParams.room_id
