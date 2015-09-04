@@ -19,6 +19,14 @@ var coordinator = require('./coordinator')
 var app = express()
 var server = spdy.createServer(config.ssl, app)
 
+app.use(function startup (req, res, next) {
+  if (/^\/(about|privacy|terms|donate)?$/.test(req.path)) {
+    let d = new Date()
+    res.locals.current_year = d.getUTCFullYear()
+  }
+  next()
+})
+
 app.use(helmet.xframe('deny'))
 app.use(helmet.hsts({
   // one year
@@ -75,10 +83,10 @@ app.use(logger('combined'))
 
 // Done with middleware - wire up routes
 app.get('/source', function (req, res) {
-  res.redirect('https://github.com/yoursecondphone/yoursecondphone')
+  res.redirect('https://github.com/nkcmr/yoursecondphone')
 })
 app.get('/issues', function (req, res) {
-  res.redirect('https://github.com/yoursecondphone/yoursecondphone/issues')
+  res.redirect('https://github.com/nkcmr/yoursecondphone/issues')
 })
 app.get('/about', basic.render('about'))
 app.get('/donate', basic.render('donate'))
