@@ -21,3 +21,6 @@ ssl
 ysp_config.js
 boot.json
 system/room_backup.json
+
+public/static/js/build/ysp.js
+public/static/css/main.css
