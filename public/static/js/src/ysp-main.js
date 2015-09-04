@@ -20,6 +20,8 @@
 
   angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize'])
 
+  .constant('rtc_supported', global.util.supports.audioVideo && global.util.supports.data)
+
   .constant('main_host', 'yoursecondphone.co')
 
   .constant('peer_server_port', parseInt(window.location.port, 10) || 443)

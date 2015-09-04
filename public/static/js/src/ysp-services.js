@@ -12,18 +12,6 @@
 
   angular.module('ysp-services', [])
 
-  .service('supportsRealTimeCommunication', ['$log',
-    function ($log) {
-      return function () {
-        if (!global.util.supports.audioVideo || !global.util.supports.data) {
-          return false
-        } else {
-          return true
-        }
-      }
-    }
-  ])
-
   /*
 
 oo.ooooo.   .ooooo.   .ooooo.  oooo d8b
