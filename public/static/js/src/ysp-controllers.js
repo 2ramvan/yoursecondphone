@@ -83,13 +83,13 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
             return new ApplicationError('no-webcam', true)
           })
           .finally(function () {
-            $scope.loading_gum = false;
+            $scope.loading_gum = false
           })
       }
 
       $scope.launchRoom = function () {
         if (!$scope.valid_room_name) {
-          return;
+          return
         }
 
         $scope.loading_room = true
