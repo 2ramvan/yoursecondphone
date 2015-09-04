@@ -20,6 +20,8 @@
 
   angular.module('ysp', ['ysp-services', 'ysp-controllers', 'ysp-directives', 'ngRoute', 'ngSanitize'])
 
+  .constant('rtc_supported', global.util.supports.audioVideo && global.util.supports.data)
+
   .constant('main_host', 'yoursecondphone.co')
 
   .constant('peer_server_port', parseInt(window.location.port, 10) || 443)
@@ -70,7 +72,7 @@
 
         $interval(function () {
           $rootScope.navOnline = navigator.onLine
-        }, 50)
+        }, 500)
       }
     }
   ])
@@ -78,10 +80,9 @@
   .factory('ApplicationError', ['$log', '$location', '$rootScope', '$timeout',
     function ($log, $location, $rootScope, $timeout) {
       function ApplicationError (type, panic) {
-        if (!this instanceof ApplicationError) return new ApplicationError(type, panic)
-
-        if (!panic) {
-          panic = false
+        panic = _.isBoolean(panic) ? panic : false
+        if (_.has(Error, 'captureStackTrace')) {
+          Error.captureStackTrace(this, ApplicationError)
         }
         Error.apply(this, arguments)
         this.name = 'ApplicationError'
