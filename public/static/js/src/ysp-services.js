@@ -12,6 +12,12 @@
 
   angular.module('ysp-services', [])
 
+  .service('_amp', [function amplitude_analytics_svc () {
+    this.logEvent = function (_eve, data, done) {
+      return _.get(global, 'amplitude.logEvent', angular.noop).call(_.get(global, 'amplitude'), _eve, data, done)
+    }
+  }])
+
   /*
 
 oo.ooooo.   .ooooo.   .ooooo.  oooo d8b
