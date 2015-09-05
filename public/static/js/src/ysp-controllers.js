@@ -65,16 +65,20 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
       $scope.loading_gum = false
       $scope.loading_room = false
 
-      $scope.$watch('room_name', function (newVal, oldVal) {
-        if (newVal === '') {
+      // for @analytics, to tell if user started the room
+      $scope.$root.came_through_root = true
+
+      $scope.$watch('room_name', function (_new_val) {
+        if (_new_val === '') {
           $scope.valid_room_name = true
         } else {
-          $scope.valid_room_name = (/^\w(\w|-){1,30}$/).test(newVal)
+          $scope.valid_room_name = (/^\w(\w|-){1,30}$/).test(_new_val)
         }
       })
 
       $scope.initGum = function () {
         $scope.loading_gum = true
+
         GumService.invoke()
           .then(function () {
             $scope.current_step = STEP_PICK_ROOM_NAME
@@ -99,6 +103,11 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
           $scope.room_name = $random.string(10)
         }
 
+        // @analytics
+        $scope.$emit('_trk_event', 'launch-room', {
+          random_name: $scope.room_name === ''
+        })
+
         coordinator.room_exists($scope.room_name, function (exists) {
           $scope.$apply(function () {
             $scope.loading_room = false
@@ -108,6 +117,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P'   "888"  `Y8bood8P'    "888" d888b    o888o
                 $scope.error_message = ''
               }, 5000)
             } else {
+              // @analytics
+              $scope.$emit('_trk_event', 'launch-room-success')
+
               $location.path('/' + $scope.room_name)
             }
           })
@@ -137,8 +149,15 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       $scope.messages = []
       $scope.draft = ''
       $scope.showMessages = true
-
       $scope.isFullscreen = false
+
+      // @analytics
+      $scope.$emit('_trk_event', 'room-ctrl-init')
+
+      if (!$scope.$root.came_through_root) {
+        // @analytics
+        $scope.$emit('_trk_event', 'joined-room')
+      }
 
       // ng-class helper that helps the peer holders determine the correct column size
       $scope.getColumnSize = function () {
@@ -148,6 +167,8 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
 
       // goFullscreen if you need help determining what this does, study code a bit more
       $scope.goFullscreen = function () {
+        // @analytics
+        $scope.$emit('_trk_event', 'go-fullscreen')
         fullscreen.request(document.querySelector('div#all-streams'))
         $timeout(angular.noop)
       }
@@ -155,19 +176,19 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
       $scope.sendMessage = function () {
         if ($scope.draft) {
           if ($scope.peers.length) {
-            async.each($scope.peers, function (peer, cb) {
-              peer.send('message', $scope.draft)
-              cb(null)
-            }, function () {
-              pushMessageToScope({
-                from: peer.id,
-                content: $scope.draft,
-                time_received: new Date()
-              })
-
-              $scope.draft = ''
-              $log.debug('Message sent!')
+            _.each($scope.peers, function (_peer) {
+              _peer.send('message', $scope.draft)
             })
+            pushMessageToScope({
+              from: peer.id,
+              content: $scope.draft,
+              time_received: new Date()
+            })
+            $scope.draft = ''
+            $log.debug('Message sent!')
+
+            // @analytics
+            $scope.$emit('_trk_event', 'sent-message')
           }
         }
       }
@@ -215,6 +236,9 @@ o888o  o888o `Y8bod8P' `Y8bod8P' o888o o888o o888o  `Y8bood8P'    "888" d888b   
         return coordinator.join_room($scope.room_id)
       })
       .then(function (roomies) {
+        // @analytics
+        $scope.$emit('_trk_event', 'room-ctrl-init-success')
+
         var mc_pool = {} // Put orphan MediaConnections here, wait for their DirectConnection
         var dc_pool = {} // visa-versa
 

@@ -287,13 +287,16 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
                                                                                       o888o      o888o
  */
 
-  .factory('PeerWrapper', ['$log', 'peer', 'GumService', '$random', '$interval', '$timeout',
-    function ($log, peer, GumService, $random, $interval, $timeout) {
+  .factory('PeerWrapper', ['$log', 'peer', 'GumService', '$random', '$interval', '$timeout', '_amp',
+    function ($log, peer, GumService, $random, $interval, $timeout, _amp) {
       var COMM_TYPE_EVENT = 'event'
       var COMM_TYPE_MESSAGE = 'msg'
       var COMM_TYPE_CALLBACK = 'cb'
 
       function PeerWrapper (peer_id, dc, mc) {
+        _amp.logEvent('peer-connect', {
+          incoming: (dc && mc)
+        })
         EventEmitter.apply(this, [])
         var self = this
 
@@ -422,6 +425,7 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
        * @return {void}
        */
       PeerWrapper.prototype._sendMessage = function (content) {
+        _amp.logEvent('send-message')
         this.dc.send({
           type: COMM_TYPE_MESSAGE,
           content: content
@@ -453,11 +457,14 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
       }
 
       PeerWrapper.prototype._receiveMessage = function (commData) {
+        _amp.logEvent('receive-message')
         this.emit('message', commData.content)
       }
 
       PeerWrapper.prototype.close = _.once(function () {
         var self = this
+
+        _amp.logEvent('peer-close')
 
         // log for science
         $log.debug('close called...')
@@ -492,13 +499,19 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
  `Y8bood8P'    `V88V"V8P' o888o o888o o888o 8""88888P'  `Y8bod8P' d888b        `8'     o888o `Y8bod8P' `Y8bod8P'
  */
 
-  .service('GumService', ['$log', '$rootScope', 'ApplicationError', '$q',
-    function ($log, $rootScope, ApplicationError, $q) {
+  .service('GumService', ['$log', '$rootScope', 'ApplicationError', '$q', '_amp',
+    function ($log, $rootScope, ApplicationError, $q, _amp) {
       var ms = null
       var isInvoked = false
 
       this.invoke = function gum_invoke () {
+        // @analytics
+        _amp.logEvent('gum-init')
+
         if (!_.isFunction(getUserMedia)) {
+          // @analytics
+          _amp.logEvent('gum-init-failure')
+
           return $q.reject('browser-incompatible')
         }
         return $q(function (resolve, reject) {
@@ -509,12 +522,17 @@ o888o        `Y8bod8P' `Y8bod8P' d888b          `8'      `8'       d888b    `Y88
             video: true,
             audio: true
           }, function (stream) {
-            $rootScope.$broadcast('gum:invoke', stream)
+            // @analytics
+            _amp.logEvent('gum-init-success')
 
+            $rootScope.$broadcast('gum:invoke', stream)
             ms = stream
             isInvoked = true
             resolve(ms)
           }, function () {
+            // @analytics
+            _amp.logEvent('gum-init-failure')
+
             $rootScope.$broadcast('gum:error', 'no-webcam')
 
             // the error from this isn't very descriptive
