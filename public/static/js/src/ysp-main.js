@@ -57,8 +57,8 @@
     }
   ])
 
-  .run(['$log', 'peer', 'coordinator', 'ApplicationError', '$interval', '$rootScope',
-    function ($log, peer, coordinator, ApplicationError, $interval, $rootScope) {
+  .run(['$log', 'peer', 'coordinator', 'ApplicationError', '$interval', '$rootScope', '_amp',
+    function ($log, peer, coordinator, ApplicationError, $interval, $rootScope, _amp) {
       if (peer.open) {
         coordinator.advertise_peer_id()
       } else {
@@ -74,11 +74,16 @@
           $rootScope.navOnline = navigator.onLine
         }, 500)
       }
+
+      $rootScope.$on('_trk_event', function ($event, event_name, data) {
+        $log.debug('tracking event: %s', event_name, data)
+        _amp.logEvent(event_name, data)
+      })
     }
   ])
 
-  .factory('ApplicationError', ['$log', '$location', '$rootScope', '$timeout',
-    function ($log, $location, $rootScope, $timeout) {
+  .factory('ApplicationError', ['$log', '$location', '$rootScope', '$timeout', '_amp',
+    function ($log, $location, $rootScope, $timeout, _amp) {
       function ApplicationError (type, panic) {
         panic = _.isBoolean(panic) ? panic : false
         if (_.has(Error, 'captureStackTrace')) {
@@ -97,6 +102,11 @@
         $log.error('ApplicationError - %s', type)
 
         if (panic) {
+          // @analytics
+          _amp.logEvent('fatal-app-error', {
+            type: type,
+            stack: _.get(this, 'stack', '(no stack trace)')
+          })
           $location.url('/error/' + type)
         }
         $timeout(angular.noop)
