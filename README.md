@@ -1,4 +1,4 @@
-## yoursecondphone [![Build Status](https://travis-ci.org/yoursecondphone/yoursecondphone.svg?branch=master)](https://travis-ci.org/yoursecondphone/yoursecondphone)
+## yoursecondphone [![Build Status](https://travis-ci.org/nkcmr/yoursecondphone.svg?branch=master)](https://travis-ci.org/yoursecondphone/yoursecondphone)
 
 your second phone is a secure and privacy-conscious video chat application. this is where all of the code is kept and worked on.
 
