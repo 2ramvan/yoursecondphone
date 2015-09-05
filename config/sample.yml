@@ -8,3 +8,6 @@ ports:
   secure: 443
   unsecure: 80
 hostname: yoursecondphone.co
+
+# for @analytics, optional
+amplitude_public_api_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
