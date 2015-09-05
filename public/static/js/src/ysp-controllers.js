@@ -5,7 +5,6 @@
   global $
   global _
   global angular
-  global async
   */
 
   angular.module('ysp-controllers', ['ngSanitize'])
