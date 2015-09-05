@@ -135,7 +135,7 @@ ooooooooooo 8""888P' `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P'   "888"
 
   .service('_socket', ['$log', 'main_host', 'ApplicationError',
     function ($log, main_host, ApplicationError) {
-      var socket = io.connect('https://' + main_host, {
+      var socket = io.connect('https://' + main_host + (global.location.port ? ':' + global.location.port : ''), {
         path: '/coordinator'
       })
 
