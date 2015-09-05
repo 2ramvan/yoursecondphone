@@ -39,6 +39,9 @@ app.use(function startup (req, res, next) {
     let d = new Date()
     res.locals.current_year = d.getUTCFullYear()
   }
+  if (config.has('amplitude_public_api_key')) {
+    res.locals.amplitude_api_key = config.get('amplitude_public_api_key')
+  }
   next()
 })
 
